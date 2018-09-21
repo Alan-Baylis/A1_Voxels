@@ -2,11 +2,29 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public struct IntPos
+{
+    public IntPos(Vector3 vecPos)
+    {
+        x = (int)vecPos.x;
+        y = (int)vecPos.y;
+        z = (int)vecPos.z;
+    }
+
+   public int x;
+   public int y;
+   public int z;
+    public Vector3 Vec3()
+    {
+        return new Vector3(x, y, z);
+    }
+}
+
 public class GameController : MonoBehaviour
 {
 
     [Header("Dependencies")]
-    public GameObject block;
+    public BlockData blockData;
     public GameObject player;
     public GameObject spawnPoint;
 
@@ -22,7 +40,6 @@ public class GameController : MonoBehaviour
     // Private Instance Variables
     private char[,,] blocks;
     private List<GameObject> _blockArray;
-
 
     // Use this for initialization
     void Start()
@@ -44,6 +61,21 @@ public class GameController : MonoBehaviour
         {
             _Regenerate();
         }
+    }
+
+    // Place a block into the world
+    public void PlaceBlock(char blockTypeID, Vector3 position)
+    {
+        IntPos blockPos = new IntPos(position);
+        blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
+        _blockArray.Add(Instantiate(blockData.GetBlockData(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+    }
+
+    // Place a block into the world
+    public void PlaceBlock(char blockTypeID, IntPos blockPos)
+    {
+        blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
+        _blockArray.Add(Instantiate(blockData.GetBlockData(blockTypeID), blockPos.Vec3(), Quaternion.identity));
     }
 
     // Private Methods
@@ -74,7 +106,6 @@ public class GameController : MonoBehaviour
         float rand = Random.Range(MinPower, MaxPower);
 
 
-
         float offsetX = Random.Range(-1024.0f, 1024.0f);
         float offsetY = Random.Range(-1024.0f, 1024.0f);
 
@@ -87,7 +118,7 @@ public class GameController : MonoBehaviour
                 {
                     if (y < Mathf.PerlinNoise((x + offsetX) / rand, (z + offsetY) / rand) * height)
                     {
-                        blocks[x, y, z] = (char)1;
+                        blocks[x, y, z] = (char)Random.Range(1, 3);
                     }
 
                 }
@@ -100,14 +131,16 @@ public class GameController : MonoBehaviour
             {
                 for (int z = 0; z < depth; z++)
                 {
-                    if (blocks[x, y, z] != 0 && (
+                    char blockTypeToGenerate = blocks[x, y, z];
+
+                    if (blockTypeToGenerate != 0 && (
                         (x == 0 || blocks[x - 1, y, z] == 0) ||
                         (y == 0 || blocks[x, y - 1, z] == 0) ||
                         (z == 0 || blocks[x, y, z - 1] == 0) ||
                         (x == width - 1 || blocks[x + 1, y, z] == 0) ||
                         (y == height - 1 || blocks[x, y + 1, z] == 0) ||
                         (z == depth - 1 || blocks[x, y, z + 1] == 0)))
-                        _blockArray.Add(Instantiate(block, new Vector3(x, y, z), Quaternion.identity));
+                        _blockArray.Add(Instantiate(blockData.GetBlockData(blockTypeToGenerate), new Vector3(x, y, z), Quaternion.identity));
                 }
             }
         }

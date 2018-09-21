@@ -215,6 +215,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1278554464}
+  - component: {fileID: 1278554465}
   - component: {fileID: 1278554463}
   m_Layer: 0
   m_Name: GameController
@@ -234,7 +235,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb34660d1805aee428232c2b7b78a5a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  block: {fileID: 1604095248756536, guid: 7bc4d2e2ea921784aaae6a700bafcac8, type: 2}
+  blockData: {fileID: 1278554465}
   player: {fileID: 1396898464}
   spawnPoint: {fileID: 5563442}
   width: 100
@@ -255,6 +256,20 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1278554465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1278554462}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12e1db1c9239d7d4187ff794c6906e86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  block_dirt: {fileID: 1604095248756536, guid: 7bc4d2e2ea921784aaae6a700bafcac8, type: 2}
+  block_grass: {fileID: 1604095248756536, guid: d36b0f2ed9e352240a184419c7b2a924,
+    type: 2}
 --- !u!1001 &1385867683
 Prefab:
   m_ObjectHideFlags: 0
@@ -313,6 +328,11 @@ Prefab:
         type: 2}
       propertyPath: m_BackGroundColor.b
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
+        type: 2}
+      propertyPath: field of view
+      value: 85
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f6dcf04dc58c58546b43885255ca1d09, type: 2}

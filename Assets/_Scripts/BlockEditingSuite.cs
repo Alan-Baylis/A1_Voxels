@@ -1,23 +1,38 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-private List<Command> commandList;
 
 public abstract class Command
 {
-
+    public abstract bool Execute();
 }
 
 public class AddBlockCommand : Command
 {
+    public GameController world;
 
+    IntPos target_position;
+    char blockType;
+
+    public AddBlockCommand(char placedBlockType, Vector3 targetPosition)
+    {
+        target_position = new IntPos(targetPosition);
+        blockType = placedBlockType;
+    }
+
+    override public bool Execute()
+    {
+        world.PlaceBlock(blockType, target_position);
+        return true;
+    }
 }
 
 public class BlockEditingSuite : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
+    private List<Command> commandList;
+
+    // Use this for initialization
+    void Start () {
 		
 	}
 	

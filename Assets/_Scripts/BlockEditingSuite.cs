@@ -3,32 +3,66 @@ using UnityEngine;
 
 public abstract class Command
 {
-    public static GameController world;
-
     protected bool m_isCompleted = false;
     public abstract void Execute();
     public abstract bool IsCompleted();
+    public abstract void Undo();
 }
 
-public class AddBlockCommand : Command
+public abstract class BlockCommand : Command
 {
-    IntPos target_position;
+    public static GameController s_world;
+    protected IntPos m_targetPosition;
+}
+
+public class AddBlockCommand : BlockCommand
+{
     char blockType;
 
     public AddBlockCommand(char placedBlockType, IntPos targetPosition)
     {
-        target_position = targetPosition;
+        m_targetPosition = targetPosition;
         blockType = placedBlockType;
     }
     public AddBlockCommand(char placedBlockType, Vector3 targetPosition)
     {
-        target_position = new IntPos(targetPosition);
+        m_targetPosition = new IntPos(targetPosition);
         blockType = placedBlockType;
     }
 
     override public void Execute()
     {
-        world.PlaceBlock(blockType, target_position);
+        s_world.PlaceBlock(blockType, m_targetPosition);
+        m_isCompleted = true;
+    }
+    public override void Undo()
+    {
+        if(m_isCompleted)
+        {
+            s_world.RemoveBlock(m_targetPosition);
+            m_isCompleted = false;
+        }
+    }
+
+    public override bool IsCompleted()
+    {
+        return m_isCompleted;
+    }
+}
+
+public class RemoveBlockCommand : BlockCommand
+{
+    char blockTypeToRemove; 
+
+    public RemoveBlockCommand(Vector3 targetPosition)
+    {
+        m_targetPosition = new IntPos(targetPosition);
+        blockTypeToRemove = s_world.GetBlockID(m_targetPosition);
+    }
+
+    override public void Execute()
+    {
+        s_world.RemoveBlock(m_targetPosition);
         m_isCompleted = true;
     }
 
@@ -36,14 +70,21 @@ public class AddBlockCommand : Command
     {
         return m_isCompleted;
     }
-
+    public override void Undo()
+    {
+        if (m_isCompleted)
+        {
+            s_world.PlaceBlock(blockTypeToRemove, m_targetPosition);
+            m_isCompleted = false;
+        }
+    }
 }
 
 public class BlockEditingSuite : MonoBehaviour {
 
     private LinkedList<Command> commandList;
 
-    public float m_maxBlockPlacingRange = 5.0f;
+    public float m_maxBlockPlacingRange = 6.0f;
 
     public char blockTypeSelection = (char)1;
 
@@ -87,6 +128,42 @@ public class BlockEditingSuite : MonoBehaviour {
             }
         }
 
+        // Remove Block
+        if (Input.GetButtonDown("RemoveBlock") || Input.GetKeyDown(KeyCode.Alpha0))
+        {
+            if (raycastConnected)
+            {
+                Debug.Log("Removing block!");
+                Execute(new RemoveBlockCommand((hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f)));
+            }
+            else
+            {
+                //Debug.Log("No surface to place block on");
+            }
+        }
+
+        // Undo Last
+        if (Input.GetButtonDown("Cancel") || Input.GetKeyDown(KeyCode.Backspace))
+        {
+            if (commandList.Count > 0)
+            {
+                var lastAction = commandList.Last;
+
+                if(lastAction.Value.IsCompleted())
+                {
+                    lastAction.Value.Undo();
+                } else
+                {
+                    Debug.Log("Could not Undo! Action not completed! Removing uncompleted action");
+                }
+
+                commandList.RemoveLast();
+            }
+            else
+            {
+                Debug.Log("Could not Undo! Nothing to Undo!");
+            }
+        }
     }
 
     public void Execute(Command command)

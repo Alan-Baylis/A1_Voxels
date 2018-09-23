@@ -11,9 +11,9 @@ public struct IntPos
         z = (int)vecPos.z;
     }
 
-   public int x;
-   public int y;
-   public int z;
+    public int x;
+    public int y;
+    public int z;
     public Vector3 Vec3()
     {
         return new Vector3(x, y, z);
@@ -24,7 +24,7 @@ public class GameController : MonoBehaviour
 {
 
     [Header("Dependencies")]
-    public BlockData blockData;
+    public BlockDatabase blockDatabase;
     public GameObject player;
     public GameObject spawnPoint;
 
@@ -39,19 +39,20 @@ public class GameController : MonoBehaviour
 
     // Private Instance Variables
     private char[,,] blocks;
-    private List<GameObject> _blockArray;
+    private GameObject[,,] _blockArray;
 
     // Use this for initialization
     void Start()
     {
         blocks = new char[width, height, depth];
-        _blockArray = new List<GameObject>();
+        _blockArray = new GameObject[width, height, depth];
 
-		spawnPoint.transform.position = new Vector3(width * 0.5f, depth *0.5f, height + 10.0f);
+        spawnPoint.transform.position = new Vector3(width * 0.5f, depth * 0.5f, height + 10.0f);
 
         player.transform.position = spawnPoint.transform.position;
 
-        Command.world = this;
+        // set up world reference so Block Commands can use it
+        BlockCommand.s_world = this;
 
         _Regenerate();
     }
@@ -65,41 +66,82 @@ public class GameController : MonoBehaviour
         }
     }
 
+    public char GetBlockID(IntPos blockPos)
+    {
+        return blocks[blockPos.x, blockPos.y, blockPos.z];
+    }
+
     // Place a block into the world
     public void PlaceBlock(char blockTypeID, Vector3 position)
     {
-        IntPos blockPos = new IntPos(position);
-        blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
-        _blockArray.Add(Instantiate(blockData.GetBlockData(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+        if (blockTypeID != 0)
+        {
+            IntPos blockPos = new IntPos(position);
+            blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
+            _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+        }
     }
 
     // Place a block into the world
     public void PlaceBlock(char blockTypeID, IntPos blockPos)
     {
-        blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
-        _blockArray.Add(Instantiate(blockData.GetBlockData(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+        if(blockTypeID != 0)
+        {
+            blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
+            _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+        }
+    }
+
+    // Remove a block from the world
+    public void RemoveBlock(IntPos blockPos)
+    {
+        blocks[blockPos.x, blockPos.y, blockPos.z] = (char)BLOCK_ID.AIR;
+        Destroy(_blockArray[blockPos.x, blockPos.y, blockPos.z]);
+
+        UpdateBlockNeighborhood(blockPos);
+    }
+    
+     // update neighboring blocks to a passed position so that Blocks are be spawned only when they can be seen
+    void UpdateBlockNeighborhood(IntPos pos)
+    {
+
+        // if the target block is transparent, then its neighborhood might need to have blocks added to it
+        if (blockDatabase.IsTransparent((BLOCK_ID)blocks[pos.x, pos.y, pos.z]))
+        {
+            // replace block gameobjects above behind, below the transparent (or removed) block
+            if (_blockArray[pos.x - 1, pos.y, pos.z] == null)
+                PlaceBlock(blocks[pos.x - 1, pos.y, pos.z], pos);
+
+            if (_blockArray[pos.x + 1, pos.y, pos.z] == null)
+                PlaceBlock(blocks[pos.x + 1, pos.y, pos.z], pos);
+
+            if (_blockArray[pos.x, pos.y - 1, pos.z] == null)
+                PlaceBlock(blocks[pos.x, pos.y - 1, pos.z], pos);
+
+            if (_blockArray[pos.x, pos.y + 1, pos.z] == null)
+                PlaceBlock(blocks[pos.x, pos.y + 1, pos.z], pos);
+
+            if (_blockArray[pos.x, pos.y, pos.z - 1] == null)
+                PlaceBlock(blocks[pos.x, pos.y, pos.z - 1], pos);
+
+            if (_blockArray[pos.x, pos.y, pos.z + 1] == null)
+                PlaceBlock(blocks[pos.x, pos.y, pos.z + 1], pos);
+        }
     }
 
     // Private Methods
     private void _Regenerate()
     {
-
-        if (_blockArray.Count > 0)
+        for (int x = 0; x < width; x++)
         {
-            foreach (var blk in _blockArray)
+            for (int y = 0; y < height; y++)
             {
-                Destroy(blk);
-            }
-
-            _blockArray.Clear();
-
-            for (int x = 0; x < width; x++)
-            {
-                for (int y = 0; y < height; y++)
+                for (int z = 0; z < depth; z++)
                 {
-                    for (int z = 0; z < depth; z++)
+                    blocks[x, y, z] = (char)0;
+                    if (_blockArray[x, y, z] != null)
                     {
-                        blocks[x, y, z] = (char)0;
+                        Destroy(_blockArray[x, y, z]);
                     }
                 }
             }
@@ -142,7 +184,7 @@ public class GameController : MonoBehaviour
                         (x == width - 1 || blocks[x + 1, y, z] == 0) ||
                         (y == height - 1 || blocks[x, y + 1, z] == 0) ||
                         (z == depth - 1 || blocks[x, y, z + 1] == 0)))
-                        _blockArray.Add(Instantiate(blockData.GetBlockData(blockTypeToGenerate), new Vector3(x, y, z), Quaternion.identity));
+                        _blockArray[x, y, z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeToGenerate), new Vector3(x, y, z), Quaternion.identity));
                 }
             }
         }

@@ -51,13 +51,15 @@ public class GameController : MonoBehaviour
 
         player.transform.position = spawnPoint.transform.position;
 
+        Command.world = this;
+
         _Regenerate();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             _Regenerate();
         }

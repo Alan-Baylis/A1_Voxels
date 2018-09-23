@@ -86,7 +86,7 @@ public class BlockEditingSuite : MonoBehaviour {
 
     public float m_maxBlockPlacingRange = 6.0f;
 
-    public char blockTypeSelection = (char)1;
+    public BLOCK_ID blockTypeSelection = BLOCK_ID.DIRT;
 
     // Use this for initialization
     void Start () {
@@ -114,14 +114,22 @@ public class BlockEditingSuite : MonoBehaviour {
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 100, Color.white);
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            blockTypeSelection = BLOCK_ID.DIRT;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            blockTypeSelection = BLOCK_ID.GRASS;
+        }
 
         // Place Block
-        if (Input.GetButtonDown("PlaceBlock") || Input.GetKeyDown(KeyCode.Alpha1))
+        if (Input.GetButtonDown("PlaceBlock"))
         {
             if(raycastConnected)
             {
                 Debug.Log("Placing block!");
-                Execute(new AddBlockCommand(blockTypeSelection, (hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)));
+                Execute(new AddBlockCommand((char)blockTypeSelection, (hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)));
             } else
             {
                 //Debug.Log("No surface to place block on");
@@ -129,7 +137,7 @@ public class BlockEditingSuite : MonoBehaviour {
         }
 
         // Remove Block
-        if (Input.GetButtonDown("RemoveBlock") || Input.GetKeyDown(KeyCode.Alpha0))
+        if (Input.GetButtonDown("RemoveBlock"))
         {
             if (raycastConnected)
             {

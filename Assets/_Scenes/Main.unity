@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657844, g: 0.49641222, b: 0.57481694, a: 1}
+  m_IndirectSpecularColor: {r: 0.44955397, g: 0.4996261, b: 0.575671, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -141,6 +141,72 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &63467100
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 63467101}
+  - component: {fileID: 63467102}
+  m_Layer: 0
+  m_Name: Point Light
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &63467101
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 63467100}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2104423665}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!108 &63467102
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 63467100}
+  m_Enabled: 1
+  serializedVersion: 8
+  m_Type: 2
+  m_Color: {r: 1, g: 1, b: 0.5647059, a: 1}
+  m_Intensity: 2
+  m_Range: 4
+  m_SpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
 --- !u!1 &170076733
 GameObject:
   m_ObjectHideFlags: 0
@@ -167,7 +233,7 @@ Light:
   serializedVersion: 8
   m_Type: 1
   m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Intensity: 2
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -200,13 +266,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 170076733}
-  m_LocalRotation: {x: 0.40821788, y: -0.23456968, z: 0.10938163, w: 0.8754261}
+  m_LocalRotation: {x: 0.47077483, y: 0.0059723337, z: 0.539891, w: 0.69774854}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: 40.581, y: 42.866, z: 91.979004}
 --- !u!1 &254837651
 GameObject:
   m_ObjectHideFlags: 0
@@ -459,7 +525,7 @@ GameObject:
   - component: {fileID: 1125104596}
   - component: {fileID: 1125104595}
   m_Layer: 5
-  m_Name: Text
+  m_Name: Reticle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -637,7 +703,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb34660d1805aee428232c2b7b78a5a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  blockData: {fileID: 1278554465}
+  blockDatabase: {fileID: 1278554465}
   player: {fileID: 1396898464}
   spawnPoint: {fileID: 5563442}
   width: 100
@@ -714,27 +780,47 @@ Prefab:
     - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
         type: 2}
       propertyPath: m_ClearFlags
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
         type: 2}
       propertyPath: m_BackGroundColor.r
-      value: 0
+      value: 0.56599325
       objectReference: {fileID: 0}
     - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
         type: 2}
       propertyPath: m_BackGroundColor.g
-      value: 0
+      value: 0.56599325
       objectReference: {fileID: 0}
     - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
         type: 2}
       propertyPath: m_BackGroundColor.b
-      value: 0
+      value: 0.745283
       objectReference: {fileID: 0}
     - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
         type: 2}
       propertyPath: field of view
-      value: 85
+      value: 75
+      objectReference: {fileID: 0}
+    - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
+        type: 2}
+      propertyPath: m_projectionMatrixMode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
+        type: 2}
+      propertyPath: near clip plane
+      value: 0.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
+        type: 2}
+      propertyPath: far clip plane
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 20478929420926224, guid: f6dcf04dc58c58546b43885255ca1d09,
+        type: 2}
+      propertyPath: m_RenderingPath
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f6dcf04dc58c58546b43885255ca1d09, type: 2}

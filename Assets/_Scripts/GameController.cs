@@ -20,6 +20,11 @@ public struct IntPos
     }
 }
 
+struct Block
+{
+
+}
+
 public class GameController : MonoBehaviour
 {
 
@@ -72,83 +77,143 @@ public class GameController : MonoBehaviour
     }
 
     // Place a block into the world
-    public void PlaceBlock(char blockTypeID, Vector3 position)
+    public bool PlaceBlock(char blockTypeID, Vector3 position)
     {
-        if (blockTypeID != 0)
+        try
         {
-            IntPos blockPos = new IntPos(position);
-            blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
-            _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+
+            if (blockTypeID != 0)
+            {
+                IntPos blockPos = new IntPos(position);
+                blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
+                _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+            }
         }
+        catch (System.Exception ex)
+        {
+            Debug.Log("PlaceBlock: " + ex.Message);
+            return false;
+        }
+        return true;
     }
 
     // Place a block into the world
-    public void PlaceBlock(char blockTypeID, IntPos blockPos)
+    public bool PlaceBlock(char blockTypeID, IntPos blockPos)
     {
-        if(blockTypeID != 0)
+        try
         {
-            blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
-            _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+            if (blockTypeID != 0)
+            {
+                blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
+                _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+            }
         }
+        catch (System.Exception ex)
+        {
+            Debug.Log("PlaceBlock: " + ex.Message);
+            return false;
+        }
+
+        return true;
     }
 
     // Remove a block from the world
-    public void RemoveBlock(IntPos blockPos)
+    public bool RemoveBlock(IntPos blockPos)
     {
-        blocks[blockPos.x, blockPos.y, blockPos.z] = (char)BLOCK_ID.AIR;
-        Destroy(_blockArray[blockPos.x, blockPos.y, blockPos.z]);
+        try
+        {
+            blocks[blockPos.x, blockPos.y, blockPos.z] = (char)BLOCK_ID.AIR;
+            Destroy(_blockArray[blockPos.x, blockPos.y, blockPos.z]);
+            UpdateBlockNeighborhood(blockPos);
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log("RemoveBlock: " + ex.Message);
+            return false;
+        }
 
-        UpdateBlockNeighborhood(blockPos);
+        return true;
     }
-    
-     // update neighboring blocks to a passed position so that Blocks are be spawned only when they can be seen
+
+    // update neighboring blocks to a passed position so that Blocks are be spawned only when they can be seen
     void UpdateBlockNeighborhood(IntPos pos)
     {
-
         // if the target block is transparent, then its neighborhood might need to have blocks added to it
         if (blockDatabase.IsTransparent((BLOCK_ID)blocks[pos.x, pos.y, pos.z]))
         {
-            // replace block gameobjects above behind, below the transparent (or removed) block
-            if (_blockArray[pos.x - 1, pos.y, pos.z] == null)
-                PlaceBlock(blocks[pos.x - 1, pos.y, pos.z], pos);
 
-            if (_blockArray[pos.x + 1, pos.y, pos.z] == null)
-                PlaceBlock(blocks[pos.x + 1, pos.y, pos.z], pos);
+            //// x
+            {
+                IntPos newPos = pos;
+                newPos.x += 1;
 
-            if (_blockArray[pos.x, pos.y - 1, pos.z] == null)
-                PlaceBlock(blocks[pos.x, pos.y - 1, pos.z], pos);
+                if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
+                {
+                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                }
+            }
 
-            if (_blockArray[pos.x, pos.y + 1, pos.z] == null)
-                PlaceBlock(blocks[pos.x, pos.y + 1, pos.z], pos);
+            {
+                IntPos newPos = pos;
+                newPos.x -= 1;
 
-            if (_blockArray[pos.x, pos.y, pos.z - 1] == null)
-                PlaceBlock(blocks[pos.x, pos.y, pos.z - 1], pos);
+                if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
+                {
+                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                }
+            }
 
-            if (_blockArray[pos.x, pos.y, pos.z + 1] == null)
-                PlaceBlock(blocks[pos.x, pos.y, pos.z + 1], pos);
+
+            //// y
+            {
+                IntPos newPos = pos;
+                newPos.y += 1;
+
+                if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
+                {
+                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                }
+            }
+
+            {
+                IntPos newPos = pos;
+                newPos.y -= 1;
+
+                if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
+                {
+                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                }
+            }
+
+
+            //// z
+            {
+                IntPos newPos = pos;
+                newPos.z += 1;
+
+                if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
+                {
+                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                }
+            }
+
+            {
+                IntPos newPos = pos;
+                newPos.z -= 1;
+
+                if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
+                {
+                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                }
+            }
         }
     }
 
     // Private Methods
     private void _Regenerate()
     {
-        for (int x = 0; x < width; x++)
-        {
-            for (int y = 0; y < height; y++)
-            {
-                for (int z = 0; z < depth; z++)
-                {
-                    blocks[x, y, z] = (char)0;
-                    if (_blockArray[x, y, z] != null)
-                    {
-                        Destroy(_blockArray[x, y, z]);
-                    }
-                }
-            }
-        }
 
         float rand = Random.Range(MinPower, MaxPower);
-
 
         float offsetX = Random.Range(-1024.0f, 1024.0f);
         float offsetY = Random.Range(-1024.0f, 1024.0f);
@@ -169,6 +234,33 @@ public class GameController : MonoBehaviour
             }
         }
 
+        UpdateVisibleBlocksOnCreation();
+
+        // spawn position
+        player.transform.position = spawnPoint.transform.position;
+    }
+    void MakeAllAir()
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                for (int z = 0; z < depth; z++)
+                {
+                    blocks[x, y, z] = (char)0;
+
+                    if (_blockArray[x, y, z] != null)
+                    {
+                        Destroy(_blockArray[x, y, z]);
+                    }
+                }
+            }
+        }
+    }
+
+    void UpdateVisibleBlocksOnCreation()
+    {
+        // create gameobjects for each block
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -184,11 +276,16 @@ public class GameController : MonoBehaviour
                         (x == width - 1 || blocks[x + 1, y, z] == 0) ||
                         (y == height - 1 || blocks[x, y + 1, z] == 0) ||
                         (z == depth - 1 || blocks[x, y, z + 1] == 0)))
+                    {
                         _blockArray[x, y, z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeToGenerate), new Vector3(x, y, z), Quaternion.identity));
+                    }
+                    else
+                    {
+                        _blockArray[x, y, z] = null;
+                    }
                 }
             }
         }
-
-        player.transform.position = spawnPoint.transform.position;
     }
 }
+

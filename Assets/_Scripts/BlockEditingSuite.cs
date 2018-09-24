@@ -32,15 +32,16 @@ public class AddBlockCommand : BlockCommand
 
     override public void Execute()
     {
-        s_world.PlaceBlock(blockType, m_targetPosition);
-        m_isCompleted = true;
+        m_isCompleted = s_world.PlaceBlock(blockType, m_targetPosition);
     }
     public override void Undo()
     {
         if(m_isCompleted)
         {
-            s_world.RemoveBlock(m_targetPosition);
-            m_isCompleted = false;
+            if(s_world.RemoveBlock(m_targetPosition))
+            {
+                m_isCompleted = false;
+            }
         }
     }
 
@@ -62,8 +63,8 @@ public class RemoveBlockCommand : BlockCommand
 
     override public void Execute()
     {
-        s_world.RemoveBlock(m_targetPosition);
-        m_isCompleted = true;
+        m_isCompleted = s_world.RemoveBlock(m_targetPosition);
+        Debug.Log("Remove block command executed! block type: " + (int)blockTypeToRemove + "position: " + m_targetPosition.x + "," + m_targetPosition.y + "," + m_targetPosition.z);
     }
 
     public override bool IsCompleted()
@@ -74,8 +75,10 @@ public class RemoveBlockCommand : BlockCommand
     {
         if (m_isCompleted)
         {
-            s_world.PlaceBlock(blockTypeToRemove, m_targetPosition);
-            m_isCompleted = false;
+            if(s_world.PlaceBlock(blockTypeToRemove, m_targetPosition))
+            {
+                m_isCompleted = false;
+            }
         }
     }
 }
@@ -129,7 +132,8 @@ public class BlockEditingSuite : MonoBehaviour {
             if(raycastConnected)
             {
                 Debug.Log("Placing block!");
-                Execute(new AddBlockCommand((char)blockTypeSelection, (hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)));
+                Command cmd = new AddBlockCommand((char)blockTypeSelection, (hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f));
+                Execute(ref cmd);
             } else
             {
                 //Debug.Log("No surface to place block on");
@@ -142,7 +146,8 @@ public class BlockEditingSuite : MonoBehaviour {
             if (raycastConnected)
             {
                 Debug.Log("Removing block!");
-                Execute(new RemoveBlockCommand((hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f)));
+                Command cmd = new RemoveBlockCommand((hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f));
+                Execute(ref cmd);
             }
             else
             {
@@ -174,10 +179,17 @@ public class BlockEditingSuite : MonoBehaviour {
         }
     }
 
-    public void Execute(Command command)
+    /// <summary>
+    /// executes passed command
+    /// </summary>
+    /// <param name="command"></param>
+    public void Execute(ref Command command)
     {
-        commandList.AddLast(command);
-        commandList.Last.Value.Execute();
+        command.Execute();
+        if (command.IsCompleted())
+        {
+            commandList.AddLast(command);
+        }
     }
 
     public void Add(Command command)

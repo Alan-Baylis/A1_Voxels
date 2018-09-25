@@ -1,12 +1,13 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using IObserverPattern;
 
 public abstract class Command
 {
     protected bool m_isCompleted = false;
-    public abstract void Execute();
+    public abstract bool Execute();
     public abstract bool IsCompleted();
-    public abstract void Undo();
+    public abstract bool Undo();
 }
 
 public abstract class BlockCommand : Command
@@ -30,19 +31,25 @@ public class AddBlockCommand : BlockCommand
         blockType = placedBlockType;
     }
 
-    override public void Execute()
+    override public bool Execute()
     {
         m_isCompleted = s_world.PlaceBlock(blockType, m_targetPosition);
+        return m_isCompleted;
     }
-    public override void Undo()
+    public override bool Undo()
     {
+        bool success = false;
+
         if (m_isCompleted)
         {
             if (s_world.RemoveBlock(m_targetPosition))
             {
                 m_isCompleted = false;
+                success = true;
             }
         }
+
+        return success;
     }
 
     public override bool IsCompleted()
@@ -61,29 +68,40 @@ public class RemoveBlockCommand : BlockCommand
         blockTypeToRemove = s_world.GetBlockID(m_targetPosition);
     }
 
-    override public void Execute()
+    override public bool Execute()
     {
         m_isCompleted = s_world.RemoveBlock(m_targetPosition);
         Debug.Log("Remove block command executed! block type: " + (int)blockTypeToRemove + "position: " + m_targetPosition.x + "," + m_targetPosition.y + "," + m_targetPosition.z);
+        return m_isCompleted;
     }
 
     public override bool IsCompleted()
     {
         return m_isCompleted;
     }
-    public override void Undo()
+
+    /// <summary>
+    /// Undo the Command if it was done already. Returns true if it was successfuly undone
+    /// </summary>
+    /// <returns></returns>
+    public override bool Undo()
     {
+        bool success = false;
+
         if (m_isCompleted)
         {
             if (s_world.PlaceBlock(blockTypeToRemove, m_targetPosition))
             {
                 m_isCompleted = false;
+                success = true;
             }
         }
+
+        return success;
     }
 }
 
-public class BlockEditingSuite : MonoBehaviour
+public class BlockEditingSuite : IObservable
 {
 
     private LinkedList<Command> commandList;
@@ -159,7 +177,12 @@ public class BlockEditingSuite : MonoBehaviour
                 {
                     Debug.Log("Placing block!");
                     Command cmd = new AddBlockCommand((char)blockTypeSelection, blockPlacePosition);
-                    Execute(ref cmd);
+
+                    if (Execute(ref cmd))
+                    {
+                        // send notification that a Block was placed
+                        NotifyAll(gameObject, OBSERVER_EVENT.PLACED_BLOCK);
+                    }
 
                 }   // endif ghostBlock colliding
                 else
@@ -213,13 +236,14 @@ public class BlockEditingSuite : MonoBehaviour
     /// executes passed command
     /// </summary>
     /// <param name="command"></param>
-    public void Execute(ref Command command)
+    public bool Execute(ref Command command)
     {
-        command.Execute();
-        if (command.IsCompleted())
+        bool success = command.Execute();
+        if (success)
         {
             commandList.AddLast(command);
         }
+        return success;
     }
 
     public void Add(Command command)

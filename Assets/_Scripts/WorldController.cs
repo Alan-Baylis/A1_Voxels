@@ -231,6 +231,7 @@ public class WorldController : MonoBehaviour
     // Private Methods
     private void _Regenerate()
     {
+        MakeAllAir();
 
         float rand = Random.Range(MinPower, MaxPower);
 

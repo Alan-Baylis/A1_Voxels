@@ -61,9 +61,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\_Scripts\AchievementManager.cs" />
     <Compile Include="Assets\_Scripts\BlockDatabase.cs" />
     <Compile Include="Assets\_Scripts\BlockEditingSuite.cs" />
+    <Compile Include="Assets\_Scripts\FirstPersonController.cs" />
+    <Compile Include="Assets\_Scripts\IObservable.cs" />
     <Compile Include="Assets\_Scripts\IObserver.cs" />
+    <Compile Include="Assets\_Scripts\PlayerAchievementChecker.cs" />
     <Compile Include="Assets\_Scripts\PlayerController.cs" />
     <Compile Include="Assets\_Scripts\WorldController.cs" />
     <Compile Include="Assets\GhostBlockProbe.cs" />

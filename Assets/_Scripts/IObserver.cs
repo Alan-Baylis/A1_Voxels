@@ -2,69 +2,27 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-public abstract class IObserver
+namespace IObserverPattern
 {
-    public abstract void OnNotify();
-}
-
-public abstract class IObservable
-{
-    LinkedList<IObserver> observers;
-
-    public void subscribe(IObserver subscriber)
+    public enum OBSERVER_EVENT
     {
-        // if observer is not already subscribed
-        if(observers.Find(subscriber) == null)
+        DEFAULT = 0,
+        ENTERED_VOID,
+        PLACED_BLOCK,
+        UNLOCKED_ACHIEVEMENT,
+        NUM_OBSERVER_EVENTS
+    }
+
+    public abstract class IObserver : IObservable
+    {
+        public void SubscribeTo(IObservable toWatch)
         {
-            // add it to the list
-            observers.AddLast(subscriber);
+            toWatch.AddSubscriber(this);
+            Debug.Log("subscriber added");
         }
-    }
 
-    public void unsubscribe(IObserver subscriber)
-    {
-        observers.Remove(subscriber);
-    }
-
-    public virtual void NotifyAllObservers()
-    {
-        foreach (IObserver item in observers)
-        {
-            item.OnNotify();
-        }
+        public abstract void OnNotify(GameObject entity, OBSERVER_EVENT observedEvent);
     }
 }
 
-/*
-public class NoiseCritterSwarm : IObserver
-{
-    public Vector3 m_seekTarget;
-    public float m_seekStrength;
-    public float m_
 
-    public bool 
-
-    // ref to player
-    public IObservable player;
-
-    List<NoiseCritter> swarmMembers;
-
-    public override void OnNotify()
-    {
-
-    }
-}*/
-
-public class NoiseCritter : MonoBehaviour
-{
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-}

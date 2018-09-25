@@ -11,7 +11,7 @@ public abstract class Command
 
 public abstract class BlockCommand : Command
 {
-    public static GameController s_world;
+    public static WorldController s_world;
     protected IntPos m_targetPosition;
 }
 
@@ -36,9 +36,9 @@ public class AddBlockCommand : BlockCommand
     }
     public override void Undo()
     {
-        if(m_isCompleted)
+        if (m_isCompleted)
         {
-            if(s_world.RemoveBlock(m_targetPosition))
+            if (s_world.RemoveBlock(m_targetPosition))
             {
                 m_isCompleted = false;
             }
@@ -53,7 +53,7 @@ public class AddBlockCommand : BlockCommand
 
 public class RemoveBlockCommand : BlockCommand
 {
-    char blockTypeToRemove; 
+    char blockTypeToRemove;
 
     public RemoveBlockCommand(Vector3 targetPosition)
     {
@@ -75,7 +75,7 @@ public class RemoveBlockCommand : BlockCommand
     {
         if (m_isCompleted)
         {
-            if(s_world.PlaceBlock(blockTypeToRemove, m_targetPosition))
+            if (s_world.PlaceBlock(blockTypeToRemove, m_targetPosition))
             {
                 m_isCompleted = false;
             }
@@ -83,7 +83,8 @@ public class RemoveBlockCommand : BlockCommand
     }
 }
 
-public class BlockEditingSuite : MonoBehaviour {
+public class BlockEditingSuite : MonoBehaviour
+{
 
     private LinkedList<Command> commandList;
 
@@ -91,30 +92,34 @@ public class BlockEditingSuite : MonoBehaviour {
 
     public BLOCK_ID blockTypeSelection = BLOCK_ID.DIRT;
 
+    public GhostBlockProbe ghostBlock;
+
     // Use this for initialization
-    void Start () {
+    void Start()
+    {
         commandList = new LinkedList<Command>();
     }
-	
-	// Update is called once per frame
-	void Update () {
 
-        bool raycastConnected = false;
+    // Update is called once per frame
+    void Update()
+    {
+
+        bool raycastHit = false;
 
         RaycastHit hit;
 
         // only collide raycast with Blocks layer
-        int layerMaskBlocksOnly = 1 << 9;
+        int layerMaskBlocksOnly = LayerMask.GetMask("Blocks");
 
         // Does the ray intersect any objects excluding the player layer
         if (Physics.Raycast(transform.position, transform.TransformDirection(Vector3.forward), out hit, m_maxBlockPlacingRange, layerMaskBlocksOnly))
         {
-            raycastConnected = true;
+            raycastHit = true;
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * hit.distance, Color.yellow);
         }
         else
         {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 100, Color.white);
+            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 10, Color.white);
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
@@ -126,33 +131,57 @@ public class BlockEditingSuite : MonoBehaviour {
             blockTypeSelection = BLOCK_ID.GRASS;
         }
 
-        // Place Block
-        if (Input.GetButtonDown("PlaceBlock"))
+        // if selection within range
+        if (raycastHit)
         {
-            if(raycastConnected)
+            // determine if block place position is too close to the player
+            Vector3 blockPlacePosition = new IntPos((hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)).Vec3();//(new IntPos(((hit.point) + (hit.normal * 0.1f))).Vec3() + new Vector3(0.5f, 0.5f, 0.5f));
+
+            // put visible ghost block there and make it visible
+            ghostBlock.transform.position = blockPlacePosition;
+            ghostBlock.gameObject.SetActive(true);
+
+            { // Debug block selection
+                Debug.DrawRay(blockPlacePosition, new Vector3(0.5f, 0.0f, 0.0f), Color.red);
+                Debug.DrawRay(blockPlacePosition, new Vector3(0.0f, 0.5f, 0.0f), Color.green);
+                Debug.DrawRay(blockPlacePosition, new Vector3(0.0f, 0.0f, 0.5f), Color.blue);
+
+                Debug.DrawRay(blockPlacePosition, new Vector3(0.0f, -0.5f, 0.0f), Color.yellow);
+            }
+
+
+            // Place Block
+            if (Input.GetButtonDown("PlaceBlock"))
             {
-                Debug.Log("Placing block!");
-                Command cmd = new AddBlockCommand((char)blockTypeSelection, (hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f));
+                // determine if block place position is too close to the player
+
+                if (!ghostBlock.isColliding)//!boxCastHit)
+                {
+                    Debug.Log("Placing block!");
+                    Command cmd = new AddBlockCommand((char)blockTypeSelection, blockPlacePosition);
+                    Execute(ref cmd);
+
+                }   // endif ghostBlock colliding
+                else
+                {
+                    Debug.Log("Cannot place block--Entity is in the way!");
+                }
+            }
+
+            // Remove Block
+            if (Input.GetButtonDown("RemoveBlock"))
+            {
+                Vector3 blockRemovePosition = (hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f);
+
+                Debug.Log("Removing block!");
+                Command cmd = new RemoveBlockCommand(blockRemovePosition);
                 Execute(ref cmd);
-            } else
-            {
-                //Debug.Log("No surface to place block on");
+
             }
         }
-
-        // Remove Block
-        if (Input.GetButtonDown("RemoveBlock"))
+        else // endif raycast hit
         {
-            if (raycastConnected)
-            {
-                Debug.Log("Removing block!");
-                Command cmd = new RemoveBlockCommand((hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f));
-                Execute(ref cmd);
-            }
-            else
-            {
-                //Debug.Log("No surface to place block on");
-            }
+            ghostBlock.gameObject.SetActive(false);
         }
 
         // Undo Last
@@ -162,10 +191,11 @@ public class BlockEditingSuite : MonoBehaviour {
             {
                 var lastAction = commandList.Last;
 
-                if(lastAction.Value.IsCompleted())
+                if (lastAction.Value.IsCompleted())
                 {
                     lastAction.Value.Undo();
-                } else
+                }
+                else
                 {
                     Debug.Log("Could not Undo! Action not completed! Removing uncompleted action");
                 }
@@ -196,5 +226,4 @@ public class BlockEditingSuite : MonoBehaviour {
     {
         commandList.AddLast(command);
     }
-
 }

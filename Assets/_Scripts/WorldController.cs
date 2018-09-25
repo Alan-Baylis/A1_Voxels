@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Like a Vector3, but with integer members instead of floats. Used for voxel world array accesses
+/// </summary>
 public struct IntPos
 {
     public IntPos(Vector3 vecPos)
@@ -20,12 +23,7 @@ public struct IntPos
     }
 }
 
-struct Block
-{
-
-}
-
-public class GameController : MonoBehaviour
+public class WorldController : MonoBehaviour
 {
 
     [Header("Dependencies")]
@@ -76,80 +74,96 @@ public class GameController : MonoBehaviour
         return blocks[blockPos.x, blockPos.y, blockPos.z];
     }
 
-    // Place a block into the world
-    public bool PlaceBlock(char blockTypeID, Vector3 position)
+    /// <summary>
+    /// Place a block into the world, will NOT place air blocks
+    /// </summary>
+    /// <param name="blockTypeID"></param>
+    /// <param name="blockPos"></param>
+    /// <returns> 
+    /// true if the operation succeeded 
+    /// </returns>
+    public bool PlaceBlock(char blockTypeID, Vector3 blockPos)
     {
-        try
-        {
-
-            if (blockTypeID != 0)
-            {
-                IntPos blockPos = new IntPos(position);
-                blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
-                _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
-            }
-        }
-        catch (System.Exception ex)
-        {
-            Debug.Log("PlaceBlock: " + ex.Message);
-            return false;
-        }
-        return true;
+        return PlaceBlock(blockTypeID, new IntPos(blockPos));
     }
 
-    // Place a block into the world
+    /// <summary>
+    /// Place a block into the world, will NOT place air blocks
+    /// </summary>
+    /// <param name="blockTypeID"></param>
+    /// <param name="blockPos"></param>
+    /// <returns> 
+    /// true if the operation succeeded 
+    /// </returns>
     public bool PlaceBlock(char blockTypeID, IntPos blockPos)
     {
+        bool opResult = false;
+
         try
         {
-            if (blockTypeID != 0)
+            if (blockTypeID != (char)BLOCK_ID.AIR && blocks[blockPos.x, blockPos.y, blockPos.z] == (char)BLOCK_ID.AIR)
             {
                 blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
                 _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+
+                opResult = true;
             }
         }
         catch (System.Exception ex)
         {
-            Debug.Log("PlaceBlock: " + ex.Message);
-            return false;
+            Debug.Log("Error: PlaceBlock: " + ex.Message);
         }
 
-        return true;
+        return opResult;
     }
 
-    // Remove a block from the world
+    /// <summary>
+    /// Remove a block from the world and replace it with air. Will NOT remove air blocks
+    /// </summary>
+    /// <param name="blockPos"></param>
+    /// <returns> 
+    /// true if the operation succeeded 
+    /// </returns>
     public bool RemoveBlock(IntPos blockPos)
     {
+        bool opResult = false;
+
         try
         {
-            blocks[blockPos.x, blockPos.y, blockPos.z] = (char)BLOCK_ID.AIR;
-            Destroy(_blockArray[blockPos.x, blockPos.y, blockPos.z]);
-            UpdateBlockNeighborhood(blockPos);
+            if (blocks[blockPos.x, blockPos.y, blockPos.z] != (char)BLOCK_ID.AIR)
+            {
+                // fill with air
+                blocks[blockPos.x, blockPos.y, blockPos.z] = (char)BLOCK_ID.AIR;
+                Destroy(_blockArray[blockPos.x, blockPos.y, blockPos.z]);
+                UpdateBlockNeighborhood(blockPos);
+
+                opResult = true;
+            }
         }
         catch (System.Exception ex)
         {
-            Debug.Log("RemoveBlock: " + ex.Message);
-            return false;
+            Debug.Log("Error: RemoveBlock: " + ex.Message);
         }
 
-        return true;
+        return opResult;
     }
 
-    // update neighboring blocks to a passed position so that Blocks are be spawned only when they can be seen
+    // update neighboring blocks to a passed position so that Block Gameobjects are spawned only when they can be seen
     void UpdateBlockNeighborhood(IntPos pos)
     {
-        // if the target block is transparent, then its neighborhood might need to have blocks added to it
+        // if the center block is transparent, then its neighborhood might need to have blocks added to it
         if (blockDatabase.IsTransparent((BLOCK_ID)blocks[pos.x, pos.y, pos.z]))
         {
-
             //// x
             {
                 IntPos newPos = pos;
                 newPos.x += 1;
 
+                // if there is no gameobject next to it...
                 if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
                 {
-                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                    // fill that gameobject spot with the corresponding block type that should be in that voxel (if it is supposed to be air then PlaceBlock will not place one)
+                    ShowBlockAtPosition(newPos);
                 }
             }
 
@@ -159,7 +173,7 @@ public class GameController : MonoBehaviour
 
                 if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
                 {
-                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                    ShowBlockAtPosition(newPos);
                 }
             }
 
@@ -171,7 +185,7 @@ public class GameController : MonoBehaviour
 
                 if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
                 {
-                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                    ShowBlockAtPosition(newPos);
                 }
             }
 
@@ -181,7 +195,7 @@ public class GameController : MonoBehaviour
 
                 if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
                 {
-                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                    ShowBlockAtPosition(newPos);
                 }
             }
 
@@ -193,7 +207,7 @@ public class GameController : MonoBehaviour
 
                 if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
                 {
-                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                    ShowBlockAtPosition(newPos);
                 }
             }
 
@@ -203,9 +217,14 @@ public class GameController : MonoBehaviour
 
                 if (_blockArray[newPos.x, newPos.y, newPos.z] == null)
                 {
-                    PlaceBlock(blocks[newPos.x, newPos.y, newPos.z], newPos);
+                    ShowBlockAtPosition(newPos);
                 }
             }
+        }
+        else
+        {
+            // The target block is opaque, therefore some blocks may need to be hidden
+            // TODO: hide blocks that are no longer visible because of an addition of a block on top of it
         }
     }
 
@@ -234,7 +253,7 @@ public class GameController : MonoBehaviour
             }
         }
 
-        UpdateVisibleBlocksOnCreation();
+        InstantiateBlocksFromVoxelData();
 
         // spawn position
         player.transform.position = spawnPoint.transform.position;
@@ -258,7 +277,7 @@ public class GameController : MonoBehaviour
         }
     }
 
-    void UpdateVisibleBlocksOnCreation()
+    void InstantiateBlocksFromVoxelData()
     {
         // create gameobjects for each block
         for (int x = 0; x < width; x++)
@@ -286,6 +305,27 @@ public class GameController : MonoBehaviour
                 }
             }
         }
+    }
+
+
+    private bool ShowBlockAtPosition(IntPos pos)
+    {
+        bool opResult = false;
+
+        try
+        {
+            if (blocks[pos.x, pos.y, pos.z] != (char)BLOCK_ID.AIR)
+            {
+                _blockArray[pos.x, pos.y, pos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blocks[pos.x, pos.y, pos.z]), pos.Vec3(), Quaternion.identity));
+                opResult = true;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log("Error: PlaceBlock: " + ex.Message);
+        }
+
+        return opResult;
     }
 }
 

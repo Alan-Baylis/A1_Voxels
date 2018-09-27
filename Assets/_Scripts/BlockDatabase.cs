@@ -7,6 +7,10 @@ public enum BLOCK_ID
     AIR = 0,
     DIRT,
     GRASS,
+    MARBLE,
+    COLUMN_BASE,
+    COLUMN_MID,
+    COLUMN_TOP,
     NUM_BLOCK_TYPES
 }
 
@@ -18,8 +22,8 @@ public class BlockProperties
         m_isTransparent = transparent;
     }
 
-    public GameObject m_prefab;
-    public bool m_isTransparent = false;
+    public GameObject m_prefab { get; private set; }
+    public bool m_isTransparent { get; private set; }
 }
 
 public class BlockDatabase : MonoBehaviour
@@ -29,11 +33,15 @@ public class BlockDatabase : MonoBehaviour
     // AIR doesn't get a prefab because it doesn't render
     public GameObject block_dirt;
     public GameObject block_grass;
+    public GameObject block_marble;
+    public GameObject block_columnBase;
+    public GameObject block_columnMid;
+    public GameObject block_columnTop;
     //
 
     private BlockProperties[] blockData;
 
-    // how to make return of this function constant?
+    // TODO: how to make return of GetBlockPrefab constant? Dont want anything editing the contents
     public GameObject GetBlockPrefab(char blockTypeID)
     {
         return blockData[blockTypeID].m_prefab;
@@ -49,12 +57,20 @@ public class BlockDatabase : MonoBehaviour
         BlockProperties air = new BlockProperties(null, true);
         BlockProperties dirt = new BlockProperties(block_dirt, false);
         BlockProperties grass = new BlockProperties(block_grass, false);
+        BlockProperties marble = new BlockProperties(block_marble, false);
+        BlockProperties columnBase = new BlockProperties(block_columnBase, true);
+        BlockProperties columnMid = new BlockProperties(block_columnMid, true);
+        BlockProperties columnTop = new BlockProperties(block_columnTop, true);
 
         blockData = new BlockProperties[(int)BLOCK_ID.NUM_BLOCK_TYPES]
         {
-            air,    // 0
-            dirt,   // 1
-            grass   // 2
+            air,            // 0
+            dirt,           // 1
+            grass,          // 2
+            marble,
+            columnBase,     // 3
+            columnMid,
+            columnTop
         };
     }
 

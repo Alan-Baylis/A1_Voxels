@@ -14,6 +14,13 @@ public struct IntPos
         z = (int)vecPos.z;
     }
 
+    public IntPos(int a_x, int a_y, int a_z)
+    {
+        x = a_x;
+        y = a_y;
+        z = a_z;
+    }
+
     public int x;
     public int y;
     public int z;
@@ -327,6 +334,12 @@ public class WorldController : MonoBehaviour
         }
 
         return opResult;
+    }
+
+    // places a block as if dropped from the sky like a connect-four piece
+    void stackBlockOnSurface(int x, int y)
+    {
+
     }
 }
 

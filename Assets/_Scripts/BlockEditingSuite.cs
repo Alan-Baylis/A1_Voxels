@@ -14,6 +14,7 @@ public abstract class BlockCommand : Command
 {
     public static WorldController s_world;
     protected IntPos m_targetPosition;
+    protected IntPos m_targetOrientation;
 }
 
 public class AddBlockCommand : BlockCommand
@@ -24,11 +25,21 @@ public class AddBlockCommand : BlockCommand
     {
         m_targetPosition = targetPosition;
         blockType = placedBlockType;
+        m_targetOrientation = new IntPos(0, 1, 0);
     }
+
+    public AddBlockCommand(char placedBlockType, IntPos targetPosition, IntPos targetOrientation)
+    {
+        m_targetPosition = targetPosition;
+        blockType = placedBlockType;
+        m_targetOrientation = targetOrientation;
+    }
+
     public AddBlockCommand(char placedBlockType, Vector3 targetPosition)
     {
         m_targetPosition = new IntPos(targetPosition);
         blockType = placedBlockType;
+        m_targetOrientation = new IntPos(0, 1, 0);
     }
 
     override public bool Execute()
@@ -148,12 +159,29 @@ public class BlockEditingSuite : IObservable
         {
             blockTypeSelection = BLOCK_ID.GRASS;
         }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            blockTypeSelection = BLOCK_ID.MARBLE;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            blockTypeSelection = BLOCK_ID.COLUMN_BASE;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            blockTypeSelection = BLOCK_ID.COLUMN_MID;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            blockTypeSelection = BLOCK_ID.COLUMN_TOP;
+        }
 
         // if selection within range
         if (raycastHit)
         {
             // determine if block place position is too close to the player
             Vector3 blockPlacePosition = new IntPos((hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)).Vec3();//(new IntPos(((hit.point) + (hit.normal * 0.1f))).Vec3() + new Vector3(0.5f, 0.5f, 0.5f));
+            IntPos integerPlacePosition = new IntPos(blockPlacePosition);
 
             // put visible ghost block there and make it visible
             ghostBlock.transform.position = blockPlacePosition;
@@ -167,16 +195,14 @@ public class BlockEditingSuite : IObservable
                 Debug.DrawRay(blockPlacePosition, new Vector3(0.0f, -0.5f, 0.0f), Color.yellow);
             }
 
-
             // Place Block
             if (Input.GetButtonDown("PlaceBlock"))
             {
                 // determine if block place position is too close to the player
-
-                if (!ghostBlock.isColliding)//!boxCastHit)
+                if (!ghostBlock.IsColliding())
                 {
                     Debug.Log("Placing block!");
-                    Command cmd = new AddBlockCommand((char)blockTypeSelection, blockPlacePosition);
+                    Command cmd = new AddBlockCommand((char)blockTypeSelection, integerPlacePosition);
 
                     if (Execute(ref cmd))
                     {

@@ -19,23 +19,23 @@ public abstract class BlockCommand : Command
 
 public class AddBlockCommand : BlockCommand
 {
-    char blockType;
+    byte blockType;
 
-    public AddBlockCommand(char placedBlockType, IntPos targetPosition)
+    public AddBlockCommand(byte placedBlockType, IntPos targetPosition)
     {
         m_targetPosition = targetPosition;
         blockType = placedBlockType;
         m_targetOrientation = new IntPos(0, 1, 0);
     }
 
-    public AddBlockCommand(char placedBlockType, IntPos targetPosition, IntPos targetOrientation)
+    public AddBlockCommand(byte placedBlockType, IntPos targetPosition, IntPos targetOrientation)
     {
         m_targetPosition = targetPosition;
         blockType = placedBlockType;
         m_targetOrientation = targetOrientation;
     }
 
-    public AddBlockCommand(char placedBlockType, Vector3 targetPosition)
+    public AddBlockCommand(byte placedBlockType, Vector3 targetPosition)
     {
         m_targetPosition = new IntPos(targetPosition);
         blockType = placedBlockType;
@@ -71,7 +71,7 @@ public class AddBlockCommand : BlockCommand
 
 public class RemoveBlockCommand : BlockCommand
 {
-    char blockTypeToRemove;
+    byte blockTypeToRemove;
 
     public RemoveBlockCommand(Vector3 targetPosition)
     {
@@ -202,7 +202,7 @@ public class BlockEditingSuite : IObservable
                 if (!ghostBlock.IsColliding())
                 {
                     Debug.Log("Placing block!");
-                    Command cmd = new AddBlockCommand((char)blockTypeSelection, integerPlacePosition);
+                    Command cmd = new AddBlockCommand((byte)blockTypeSelection, integerPlacePosition);
 
                     if (Execute(ref cmd))
                     {

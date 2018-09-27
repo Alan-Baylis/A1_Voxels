@@ -40,7 +40,7 @@ public class WorldController : MonoBehaviour
 
     [Header("World Size")]
     public int width = 64;
-    public int height = 32;
+    public int height = 64;
     public int depth = 64;
 
     [Header("Generator Settings")]
@@ -48,16 +48,15 @@ public class WorldController : MonoBehaviour
     public float MaxPower = 24.0f;
 
     // Private Instance Variables
-    private char[,,] blocks;
+    private byte[,,] blocks;
     private GameObject[,,] _blockArray;
 
     // Use this for initialization
     void Start()
     {
-        blocks = new char[width, height, depth];
-        _blockArray = new GameObject[width, height, depth];
-
-        spawnPoint.transform.position = new Vector3(width * 0.5f, depth * 0.5f, height + 10.0f);
+        Vector3 playerSpawnPos = new Vector3(width * 0.5f, depth * 0.5f, height + 10.0f);
+        spawnPoint.transform.position = playerSpawnPos;
+        
 
         player.transform.position = spawnPoint.transform.position;
 
@@ -76,7 +75,7 @@ public class WorldController : MonoBehaviour
         }
     }
 
-    public char GetBlockID(IntPos blockPos)
+    public byte GetBlockID(IntPos blockPos)
     {
         return blocks[blockPos.x, blockPos.y, blockPos.z];
     }
@@ -89,7 +88,7 @@ public class WorldController : MonoBehaviour
     /// <returns> 
     /// true if the operation succeeded 
     /// </returns>
-    public bool PlaceBlock(char blockTypeID, Vector3 blockPos)
+    public bool PlaceBlock(byte blockTypeID, Vector3 blockPos)
     {
         return PlaceBlock(blockTypeID, new IntPos(blockPos));
     }
@@ -102,16 +101,29 @@ public class WorldController : MonoBehaviour
     /// <returns> 
     /// true if the operation succeeded 
     /// </returns>
-    public bool PlaceBlock(char blockTypeID, IntPos blockPos)
+    public bool PlaceBlock(byte blockTypeID, IntPos blockPos)
+    {
+        return PlaceBlock(blockTypeID, blockPos.x, blockPos.y, blockPos.z);
+    }
+
+    /// <summary>
+    /// Place a block into the world, will NOT place air blocks
+    /// </summary>
+    /// <param name="blockTypeID"></param>
+    /// <param name="x"></param>
+    /// <param name="y"></param>
+    /// <param name="z"></param>
+    /// <returns></returns>
+    public bool PlaceBlock(byte blockTypeID, int x, int y, int z)
     {
         bool opResult = false;
 
         try
         {
-            if (blockTypeID != (char)BLOCK_ID.AIR && blocks[blockPos.x, blockPos.y, blockPos.z] == (char)BLOCK_ID.AIR)
+            if (blockTypeID != (byte)BLOCK_ID.AIR && blocks[x, y, z] == (byte)BLOCK_ID.AIR)
             {
-                blocks[blockPos.x, blockPos.y, blockPos.z] = blockTypeID;
-                _blockArray[blockPos.x, blockPos.y, blockPos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), blockPos.Vec3(), Quaternion.identity));
+                blocks[x, y, z] = blockTypeID;
+                _blockArray[x, y, z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeID), new Vector3(x, y, z), Quaternion.identity));
 
                 opResult = true;
             }
@@ -137,12 +149,36 @@ public class WorldController : MonoBehaviour
 
         try
         {
-            if (blocks[blockPos.x, blockPos.y, blockPos.z] != (char)BLOCK_ID.AIR)
+            if (blocks[blockPos.x, blockPos.y, blockPos.z] != (byte)BLOCK_ID.AIR)
             {
                 // fill with air
-                blocks[blockPos.x, blockPos.y, blockPos.z] = (char)BLOCK_ID.AIR;
+                blocks[blockPos.x, blockPos.y, blockPos.z] = (byte)BLOCK_ID.AIR;
                 Destroy(_blockArray[blockPos.x, blockPos.y, blockPos.z]);
                 UpdateBlockNeighborhood(blockPos);
+
+                opResult = true;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log("Error: RemoveBlock: " + ex.Message);
+        }
+
+        return opResult;
+    }
+
+    public bool RemoveBlock(int x, int y, int z)
+    {
+        bool opResult = false;
+
+        try
+        {
+            if (blocks[x, y, z] != (byte)BLOCK_ID.AIR)
+            {
+                // fill with air
+                blocks[x, y, z] = (byte)BLOCK_ID.AIR;
+                Destroy(_blockArray[x, y, z]);
+                UpdateBlockNeighborhood(new IntPos(x,y,z));
 
                 opResult = true;
             }
@@ -238,6 +274,9 @@ public class WorldController : MonoBehaviour
     // Private Methods
     private void _Regenerate()
     {
+        blocks = new byte[width, height, depth];
+        _blockArray = new GameObject[width, height, depth];
+
         MakeAllAir();
 
         float rand = Random.Range(MinPower, MaxPower);
@@ -254,7 +293,7 @@ public class WorldController : MonoBehaviour
                 {
                     if (y < Mathf.PerlinNoise((x + offsetX) / rand, (z + offsetY) / rand) * height)
                     {
-                        blocks[x, y, z] = (char)Random.Range(1, 3);
+                        blocks[x, y, z] = (byte)Random.Range(1, 3);
                     }
 
                 }
@@ -265,6 +304,20 @@ public class WorldController : MonoBehaviour
 
         // spawn position
         player.transform.position = spawnPoint.transform.position;
+        IntPos playerPos = new IntPos(player.transform.position);
+
+        int spawnPlatformWidth = 3;
+
+        GeneratePlatform(playerPos.x, playerPos.z, spawnPlatformWidth, 2, 5, BLOCK_ID.MARBLE);
+        GeneratePlatform(playerPos.x, playerPos.z, 1, 1, 1, BLOCK_ID.MARBLE);
+
+        GenerateColumn(playerPos.x - spawnPlatformWidth, playerPos.z - spawnPlatformWidth);
+        GenerateColumn(playerPos.x + spawnPlatformWidth, playerPos.z + spawnPlatformWidth);
+
+        GenerateColumn(playerPos.x - spawnPlatformWidth, playerPos.z + spawnPlatformWidth);
+        GenerateColumn(playerPos.x + spawnPlatformWidth, playerPos.z - spawnPlatformWidth);
+
+        StackBlockOnSurface(playerPos.x, playerPos.z, (byte)BLOCK_ID.COLUMN_BASE);
     }
     void MakeAllAir()
     {
@@ -274,7 +327,7 @@ public class WorldController : MonoBehaviour
             {
                 for (int z = 0; z < depth; z++)
                 {
-                    blocks[x, y, z] = (char)0;
+                    blocks[x, y, z] = (byte)0;
 
                     if (_blockArray[x, y, z] != null)
                     {
@@ -294,7 +347,7 @@ public class WorldController : MonoBehaviour
             {
                 for (int z = 0; z < depth; z++)
                 {
-                    char blockTypeToGenerate = blocks[x, y, z];
+                    byte blockTypeToGenerate = blocks[x, y, z];
 
                     if (blockTypeToGenerate != 0 && (
                         (x == 0 || blocks[x - 1, y, z] == 0) ||
@@ -322,7 +375,7 @@ public class WorldController : MonoBehaviour
 
         try
         {
-            if (blocks[pos.x, pos.y, pos.z] != (char)BLOCK_ID.AIR)
+            if (blocks[pos.x, pos.y, pos.z] != (byte)BLOCK_ID.AIR)
             {
                 _blockArray[pos.x, pos.y, pos.z] = (Instantiate(blockDatabase.GetBlockPrefab(blocks[pos.x, pos.y, pos.z]), pos.Vec3(), Quaternion.identity));
                 opResult = true;
@@ -336,10 +389,51 @@ public class WorldController : MonoBehaviour
         return opResult;
     }
 
-    // places a block as if dropped from the sky like a connect-four piece
-    void stackBlockOnSurface(int x, int y)
+    // places a block as if dropped from the sky like a connect-four piece. returns y-position of placed block. -1 if it couldnt place
+    int StackBlockOnSurface(int x, int z, byte blockType)
     {
+        for (int y = (height - 2); y >= 0; y--)
+        {
+            // if a solid block is found,
+            if (blockDatabase.GetProperties((BLOCK_ID)blocks[x, y, z]).m_isSolid)
+            {
+                // place a block on top of it
+                if (PlaceBlock(blockType, x, y + 1, z))
+                {
+                    return y + 1;
+                }
+            }
+        }
+        return -1;
+    }
+    
+    void GeneratePlatform(int xCenter, int zCenter, int width, int platformHeight, int platformDepth, BLOCK_ID blockType)
+    {
+        int platformAlt = StackBlockOnSurface(xCenter, zCenter, (byte)blockType);
 
+        for (int y = platformAlt + platformHeight - 1; y > platformAlt - platformDepth; y--)
+        {
+            for (int x = xCenter - width; x <= xCenter + width; x++)
+            {
+                for (int z = zCenter - width; z <= zCenter + width; z++)
+                {
+                    if(blocks[x, y, z] != (int)BLOCK_ID.AIR)
+                    {
+                        RemoveBlock(x, y, z);
+                    }
+
+                    PlaceBlock((byte)blockType, x, y, z);
+                }
+            }
+        }
+    }
+    void GenerateColumn(int x, int z)
+    {
+        StackBlockOnSurface(x, z, (byte)BLOCK_ID.MARBLE);
+        StackBlockOnSurface(x, z, (byte)BLOCK_ID.COLUMN_BASE);
+        StackBlockOnSurface(x, z, (byte)BLOCK_ID.COLUMN_MID);
+        StackBlockOnSurface(x, z, (byte)BLOCK_ID.COLUMN_TOP);
+        StackBlockOnSurface(x, z, (byte)BLOCK_ID.MARBLE);
     }
 }
 

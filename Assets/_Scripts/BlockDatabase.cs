@@ -14,16 +14,27 @@ public enum BLOCK_ID
     NUM_BLOCK_TYPES
 }
 
+//public enum BLOCK_PROPERTY_FLAGS
+//{
+//
+//}
+
 public class BlockProperties
 {
-    public BlockProperties(GameObject prefab, bool transparent = false)
+    public BlockProperties(GameObject prefab, bool transparent = false, bool isSolid = true)
     {
         m_prefab = prefab;
         m_isTransparent = transparent;
+        m_isSolid = isSolid;
     }
 
     public GameObject m_prefab { get; private set; }
+
+    // can anything be seen beyond it?
     public bool m_isTransparent { get; private set; }
+
+    // can a block be placed onto it?
+    public bool m_isSolid { get; private set; }
 }
 
 public class BlockDatabase : MonoBehaviour
@@ -42,7 +53,7 @@ public class BlockDatabase : MonoBehaviour
     private BlockProperties[] blockData;
 
     // TODO: how to make return of GetBlockPrefab constant? Dont want anything editing the contents
-    public GameObject GetBlockPrefab(char blockTypeID)
+    public GameObject GetBlockPrefab(byte blockTypeID)
     {
         return blockData[blockTypeID].m_prefab;
     }
@@ -52,9 +63,14 @@ public class BlockDatabase : MonoBehaviour
         return blockData[(int)type].m_isTransparent;
     }
 
+    public BlockProperties GetProperties(BLOCK_ID type)
+    {
+        return blockData[(int)type];
+    }
+
     private void Awake()
     {
-        BlockProperties air = new BlockProperties(null, true);
+        BlockProperties air = new BlockProperties(null, true, false);
         BlockProperties dirt = new BlockProperties(block_dirt, false);
         BlockProperties grass = new BlockProperties(block_grass, false);
         BlockProperties marble = new BlockProperties(block_marble, false);

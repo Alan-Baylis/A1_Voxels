@@ -1152,6 +1152,11 @@ Prefab:
       value: 
       objectReference: {fileID: 1806194318348988, guid: cb00ac67cf06c3b4890a61143e8d57ba,
         type: 2}
+    - target: {fileID: 114190783606031156, guid: 493d22fb0823d9b47980a33115260b8b,
+        type: 2}
+      propertyPath: height
+      value: 32
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 493d22fb0823d9b47980a33115260b8b, type: 2}
   m_IsPrefabAsset: 0

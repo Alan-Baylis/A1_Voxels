@@ -1,0 +1,75 @@
+#Pseudocode for Command Pattern
+
+Interface Command
+{
+	Variable isCompleted = false
+
+	Process Execute
+	Process Undo
+}
+
+Class AddBlockCommand implements Command
+{
+	Variable blockID
+	Variable targetPosition
+
+	Process Execute
+	{
+		place block of type blockID at targetPosition
+		isCompleted = true
+	}
+	
+	Process Undo
+	{
+		remove block from targetPosition
+		isCompleted = false
+	}
+}
+
+Class RemoveBlockCommand implements Command
+{
+	Variable blockID
+	Variable targetPosition
+
+	Process Execute
+	{
+		remove block from targetPosition
+		isCompleted = true
+	}
+	
+	Process Undo
+	{
+		place block of type blockID into targetPosition
+		isCompleted = false
+	}
+}
+
+Class BlockEditingSuite
+{
+	Container commandHistory
+	Update()
+	{
+		IF user input detects an "add block" signal
+		THEN 
+			Variable targetPosition = the position the user's character is looking at
+			initialize an AddBlockCommand with the user's currently selected block type and targetPosition
+			add the AddBlockCommand to commandHistory
+			
+		IF user input detects an "remove block" signal
+		THEN 
+			Variable targetPosition = the position the user's character is looking at
+			Variable blockType = the block at the position the user's character is looking at
+			initialize a RemoveBlockCommand with blockType and targetPosition
+			add the RemoveBlockCommand to commandHistory
+			
+		IF user input detects an "undo action" signal
+		THEN 
+			activate the Undo process on the last Command in commandHistory
+			remove the last Command in commandHistory
+		
+		IF commandHistory contains unexecuted Commands 
+		THEN 
+			for each unexecuted Command in commandHistory
+			activate its Execute process
+	}
+}

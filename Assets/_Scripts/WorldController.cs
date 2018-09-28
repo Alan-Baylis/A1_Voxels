@@ -411,7 +411,7 @@ public class WorldController : MonoBehaviour
     {
         int platformAlt = StackBlockOnSurface(xCenter, zCenter, (byte)blockType);
 
-        for (int y = platformAlt + platformHeight - 1; y > platformAlt - platformDepth; y--)
+        for (int y = platformAlt + platformHeight - 1; (y > platformAlt - platformDepth) && y >= 0; y--)
         {
             for (int x = xCenter - width; x <= xCenter + width; x++)
             {

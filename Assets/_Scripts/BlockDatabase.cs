@@ -25,13 +25,21 @@ public class BlockDatabase : MonoBehaviour
     [Header("Dependencies")]
     // Declare different block Prefabs here
     // AIR doesn't get a prefab because it doesn't render
-    public GameObject block_dirt;
-    public GameObject block_grass;
-    public GameObject block_marble;
-    public GameObject block_columnBase;
-    public GameObject block_columnMid;
-    public GameObject block_columnTop;
+   // public GameObject block_dirt;
+   // public GameObject block_grass;
+   // public GameObject block_marble;
+   // public GameObject block_columnBase;
+   // public GameObject block_columnMid;
+   // public GameObject block_columnTop;
     //
+    //public AirBlockProperties           air;
+    //public DirtBlockProperties          dirt;
+    //public GrassBlockProperties         grass;
+    //public MarbleBlockProperties        marble;
+    //public ColumnBaseBlockProperties    columnBase;
+    //public ColumnMidBlockProperties     columnMid;
+    //public ColumnTopBlockProperties     columnTop;
+
 
     private BlockProperties[] blockData;
 
@@ -53,29 +61,31 @@ public class BlockDatabase : MonoBehaviour
 
     private void Awake()
     {
-        BlockProperties air = new BlockProperties(null, true, false);
-
-        BlockProperties dirt = new BlockProperties(block_dirt, false);
-
-        BlockProperties grass = new BlockProperties(block_grass, false);
-
-        BlockProperties marble = new BlockProperties(block_marble, false);
-
-        BlockProperties columnBase = new BlockProperties(block_columnBase, true);
-
-        BlockProperties columnMid = new BlockProperties(block_columnMid, true);
-
-        BlockProperties columnTop = new BlockProperties(block_columnTop, true);
+        //BlockProperties air = new BlockProperties(null, true, false);
+        //BlockProperties dirt = new BlockProperties(block_dirt, false);
+        //BlockProperties grass = new BlockProperties(block_grass, false);
+        //BlockProperties marble = new BlockProperties(block_marble, false);
+        //BlockProperties columnBase = new BlockProperties(block_columnBase, true);
+        //BlockProperties columnMid = new BlockProperties(block_columnMid, true);
+        //BlockProperties columnTop = new BlockProperties(block_columnTop, true);
 
         blockData = new BlockProperties[(int)BLOCK_ID.NUM_BLOCK_TYPES]
         {
-            air,            // 0
-            dirt,           // 1
-            grass,          // 2
-            marble,
-            columnBase,     // 3
-            columnMid,
-            columnTop
+            //air,            // 0
+            //dirt,           // 1
+            //grass,          // 2
+            //marble,
+            //columnBase,     // 3
+            //columnMid,
+            //columnTop
+
+            GetComponent<AirBlockProperties         >(),
+            GetComponent<DirtBlockProperties        >(),
+            GetComponent<GrassBlockProperties       >(),
+            GetComponent<MarbleBlockProperties      >(),
+            GetComponent<ColumnBaseBlockProperties  >(),
+            GetComponent<ColumnMidBlockProperties   >(),
+            GetComponent<ColumnTopBlockProperties   >()
         };
     }
 

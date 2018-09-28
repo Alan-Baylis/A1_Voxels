@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using IObserverPattern;
+using UnityEngine.UI;
 
 public abstract class Command
 {
@@ -79,6 +80,12 @@ public class RemoveBlockCommand : BlockCommand
         blockTypeToRemove = s_world.GetBlockID(m_targetPosition);
     }
 
+    public RemoveBlockCommand(byte blockTypeAtPosition, IntPos targetPosition)
+    {
+        m_targetPosition = targetPosition;
+        blockTypeToRemove = blockTypeAtPosition;
+    }
+
     override public bool Execute()
     {
         m_isCompleted = s_world.RemoveBlock(m_targetPosition);
@@ -114,6 +121,8 @@ public class RemoveBlockCommand : BlockCommand
 
 public class BlockEditingSuite : IObservable
 {
+    public WorldController world;
+    public BlockDatabase blockDatabase;
 
     private LinkedList<Command> commandList;
 
@@ -122,6 +131,8 @@ public class BlockEditingSuite : IObservable
     public BLOCK_ID blockTypeSelection = BLOCK_ID.DIRT;
 
     public GhostBlockProbe ghostBlock;
+
+    public Text blockDescriptionUI;
 
     // Use this for initialization
     void Start()
@@ -183,6 +194,17 @@ public class BlockEditingSuite : IObservable
             Vector3 blockPlacePosition = new IntPos((hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)).Vec3();//(new IntPos(((hit.point) + (hit.normal * 0.1f))).Vec3() + new Vector3(0.5f, 0.5f, 0.5f));
             IntPos integerPlacePosition = new IntPos(blockPlacePosition);
 
+            // position of the block the raycast hit
+            IntPos hitBlockPosition = new IntPos((hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f));
+
+            byte hitBlockType = world.GetBlockID(hitBlockPosition);
+
+            // get all properties of the block the raycast hit
+            BlockProperties hitBlockProperties = blockDatabase.GetProperties((BLOCK_ID)hitBlockType);
+
+            // show description text for block
+            blockDescriptionUI.text = hitBlockProperties.m_description;
+
             // put visible ghost block there and make it visible
             ghostBlock.transform.position = blockPlacePosition;
             ghostBlock.gameObject.SetActive(true);
@@ -199,7 +221,7 @@ public class BlockEditingSuite : IObservable
             if (Input.GetButtonDown("PlaceBlock"))
             {
                 // determine if block place position is too close to the player
-                if (!ghostBlock.IsColliding())
+                if (!ghostBlock.IsColliding() && hitBlockProperties.m_canBePlacedUpon)
                 {
                     Debug.Log("Placing block!");
                     Command cmd = new AddBlockCommand((byte)blockTypeSelection, integerPlacePosition);
@@ -220,10 +242,10 @@ public class BlockEditingSuite : IObservable
             // Remove Block
             if (Input.GetButtonDown("RemoveBlock"))
             {
-                Vector3 blockRemovePosition = (hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f);
+                
 
                 Debug.Log("Removing block!");
-                Command cmd = new RemoveBlockCommand(blockRemovePosition);
+                Command cmd = new RemoveBlockCommand(hitBlockType, hitBlockPosition);
                 Execute(ref cmd);
 
             }
@@ -231,6 +253,7 @@ public class BlockEditingSuite : IObservable
         else // endif raycast hit
         {
             ghostBlock.gameObject.SetActive(false);
+            blockDescriptionUI.text = "";
         }
 
         // Undo Last

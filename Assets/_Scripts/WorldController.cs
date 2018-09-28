@@ -395,7 +395,7 @@ public class WorldController : MonoBehaviour
         for (int y = (height - 2); y >= 0; y--)
         {
             // if a solid block is found,
-            if (blockDatabase.GetProperties((BLOCK_ID)blocks[x, y, z]).m_isSolid)
+            if (blockDatabase.GetProperties((BLOCK_ID)blocks[x, y, z]).m_canBePlacedUpon)
             {
                 // place a block on top of it
                 if (PlaceBlock(blockType, x, y + 1, z))

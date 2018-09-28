@@ -19,23 +19,6 @@ public enum BLOCK_ID
 //
 //}
 
-public class BlockProperties
-{
-    public BlockProperties(GameObject prefab, bool transparent = false, bool isSolid = true)
-    {
-        m_prefab = prefab;
-        m_isTransparent = transparent;
-        m_isSolid = isSolid;
-    }
-
-    public GameObject m_prefab { get; private set; }
-
-    // can anything be seen beyond it?
-    public bool m_isTransparent { get; private set; }
-
-    // can a block be placed onto it?
-    public bool m_isSolid { get; private set; }
-}
 
 public class BlockDatabase : MonoBehaviour
 {
@@ -71,11 +54,17 @@ public class BlockDatabase : MonoBehaviour
     private void Awake()
     {
         BlockProperties air = new BlockProperties(null, true, false);
+
         BlockProperties dirt = new BlockProperties(block_dirt, false);
+
         BlockProperties grass = new BlockProperties(block_grass, false);
+
         BlockProperties marble = new BlockProperties(block_marble, false);
+
         BlockProperties columnBase = new BlockProperties(block_columnBase, true);
+
         BlockProperties columnMid = new BlockProperties(block_columnMid, true);
+
         BlockProperties columnTop = new BlockProperties(block_columnTop, true);
 
         blockData = new BlockProperties[(int)BLOCK_ID.NUM_BLOCK_TYPES]

@@ -8,6 +8,11 @@ MonoImporter:
       type: 2}
   - block_grass: {fileID: 1604095248756536, guid: d36b0f2ed9e352240a184419c7b2a924,
       type: 2}
+  - block_marble: {fileID: 1806194318348988, guid: cb00ac67cf06c3b4890a61143e8d57ba,
+      type: 2}
+  - block_columnBase: {instanceID: 0}
+  - block_columnMid: {instanceID: 0}
+  - block_columnTop: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

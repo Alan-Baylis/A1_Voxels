@@ -73,6 +73,11 @@ public class WorldController : MonoBehaviour
         {
             _Regenerate();
         }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            MakeAllAir();
+        }
     }
 
     public byte GetBlockID(IntPos blockPos)
@@ -332,6 +337,7 @@ public class WorldController : MonoBehaviour
                     if (_blockArray[x, y, z] != null)
                     {
                         Destroy(_blockArray[x, y, z]);
+                        _blockArray[x, y, z] = null;
                     }
                 }
             }

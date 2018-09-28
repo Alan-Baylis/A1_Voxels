@@ -64,6 +64,14 @@
     <Compile Include="Assets\_Scripts\AchievementManager.cs" />
     <Compile Include="Assets\_Scripts\BlockDatabase.cs" />
     <Compile Include="Assets\_Scripts\BlockEditingSuite.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\AirBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\BlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\ColumnBaseBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\ColumnMidBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\ColumnTopBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\DirtBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\GrassBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\MarbleBlockProperties.cs" />
     <Compile Include="Assets\_Scripts\FirstPersonController.cs" />
     <Compile Include="Assets\_Scripts\GhostBlockProbe.cs" />
     <Compile Include="Assets\_Scripts\IObservable.cs" />

@@ -403,11 +403,6 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 416409728}
   m_CullTransparentMesh: 0
---- !u!1 &636920810 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1806194318348988, guid: 3e6d47d5101658c42bc3841a5286d1ca,
-    type: 2}
-  m_PrefabInternal: {fileID: 98137406}
 --- !u!1 &683420202
 GameObject:
   m_ObjectHideFlags: 0
@@ -505,10 +500,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20db9e397da4a0b4a821891cd1e0932b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_prefab: {fileID: 636920810}
+  m_prefab: {fileID: 1806194318348988, guid: 3e6d47d5101658c42bc3841a5286d1ca, type: 2}
   m_isTransparent: 1
   m_canBePlacedUpon: 1
-  m_description: Column Top
+  m_description: 
 --- !u!114 &709897838
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -523,7 +518,7 @@ MonoBehaviour:
   m_prefab: {fileID: 1692604712429282, guid: 449479b470819fa45b883d4d993551f6, type: 2}
   m_isTransparent: 1
   m_canBePlacedUpon: 1
-  m_description: Column Mid
+  m_description: 
 --- !u!114 &709897839
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -538,7 +533,7 @@ MonoBehaviour:
   m_prefab: {fileID: 1692604712429282, guid: 3de46687b3cf8554eb9f73acf84fd2bb, type: 2}
   m_isTransparent: 1
   m_canBePlacedUpon: 1
-  m_description: Column Base
+  m_description: 
 --- !u!114 &709897840
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -553,7 +548,7 @@ MonoBehaviour:
   m_prefab: {fileID: 1806194318348988, guid: cb00ac67cf06c3b4890a61143e8d57ba, type: 2}
   m_isTransparent: 0
   m_canBePlacedUpon: 1
-  m_description: Marble
+  m_description: 
 --- !u!114 &709897841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,7 +563,7 @@ MonoBehaviour:
   m_prefab: {fileID: 1604095248756536, guid: d36b0f2ed9e352240a184419c7b2a924, type: 2}
   m_isTransparent: 0
   m_canBePlacedUpon: 1
-  m_description: Grass
+  m_description: 
 --- !u!114 &709897842
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -583,7 +578,7 @@ MonoBehaviour:
   m_prefab: {fileID: 1604095248756536, guid: 7bc4d2e2ea921784aaae6a700bafcac8, type: 2}
   m_isTransparent: 0
   m_canBePlacedUpon: 1
-  m_description: Dirt
+  m_description: 
 --- !u!114 &709897843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -598,7 +593,7 @@ MonoBehaviour:
   m_prefab: {fileID: 0}
   m_isTransparent: 1
   m_canBePlacedUpon: 0
-  m_description: Air
+  m_description: 
 --- !u!114 &709897844
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1206,12 +1201,34 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4711612356134162, guid: f6dcf04dc58c58546b43885255ca1d09,
     type: 2}
   m_PrefabInternal: {fileID: 1385867683}
---- !u!114 &1307516804 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 114742609251580856, guid: f4cf23b91205c7343abccb3d0895420b,
-    type: 2}
-  m_PrefabInternal: {fileID: 1131064942}
-  m_Script: {fileID: 708705254, guid: f70555f144d8491a825f0804e09c671c, type: 3}
+--- !u!1 &1302013126
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1302013127}
+  m_Layer: 0
+  m_Name: TheWorld
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1302013127
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1302013126}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.745607, y: 1.1561712, z: -1.7634149}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1331698179
 Prefab:
   m_ObjectHideFlags: 0
@@ -1409,6 +1426,7 @@ GameObject:
   - component: {fileID: 1417427343}
   - component: {fileID: 1417427345}
   - component: {fileID: 1417427344}
+  - component: {fileID: 1417427340}
   m_Layer: 0
   m_Name: WorldController
   m_TagString: Untagged
@@ -1416,6 +1434,18 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1417427340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1417427339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea07ccffc0579b7438744936d53e4858, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  worldController: {fileID: 1417427345}
 --- !u!4 &1417427343
 Transform:
   m_ObjectHideFlags: 0
@@ -1445,7 +1475,7 @@ MonoBehaviour:
   player: {fileID: 1396898465}
   blockEditor: {fileID: 2104423669}
   textBox: {fileID: 1407500244}
-  titleField: {fileID: 1307516804}
+  titleField: {fileID: 416409730}
   descField: {fileID: 2063599985}
 --- !u!114 &1417427345
 MonoBehaviour:
@@ -1463,10 +1493,13 @@ MonoBehaviour:
   player: {fileID: 1396898464}
   spawnPoint: {fileID: 5563442}
   width: 64
-  height: 32
+  height: 64
   depth: 64
-  MinPower: 32
-  MaxPower: 64
+  MinPower: 16
+  MaxPower: 24
+  theWorld: {fileID: 1302013126}
+  TPBuilding: {fileID: 1956808153}
+  Ball: {fileID: 1803398484}
 --- !u!114 &1450488896 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114862851848998392, guid: cfa1296ab0972104681583e9f77e5603,
@@ -1478,6 +1511,16 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4963373879098038, guid: 3e6d47d5101658c42bc3841a5286d1ca,
     type: 2}
   m_PrefabInternal: {fileID: 98137406}
+--- !u!1 &1803398484 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1181294303088688, guid: da5c0ab683f5a884887ddd60cb099352,
+    type: 2}
+  m_PrefabInternal: {fileID: 1162781448}
+--- !u!1 &1956808153 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1320992810174438, guid: 3029bb2cb81dfcb41a31e4b15a89cced,
+    type: 2}
+  m_PrefabInternal: {fileID: 1331698179}
 --- !u!114 &2063599985 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 114712218059016642, guid: f4cf23b91205c7343abccb3d0895420b,

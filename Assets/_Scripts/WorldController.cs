@@ -40,9 +40,9 @@ public class WorldController : MonoBehaviour
     public GameObject spawnPoint;
 
     [Header("World Size")]
-    public int width = 64;
-    public int height = 64;
-    public int depth = 64;
+    public int width;
+    public int height;
+    public int depth;
 
     [Header("Generator Settings")]
     public float MinPower = 16.0f;
@@ -54,6 +54,8 @@ public class WorldController : MonoBehaviour
 
     public GameObject theWorld;
 
+    public GameObject TPBuilding;
+    public GameObject Ball;
 
     // public read-only properties
     public byte[,,] Blocks
@@ -85,12 +87,6 @@ public class WorldController : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        Vector3 playerSpawnPos = new Vector3(width * 0.5f, depth * 0.5f, height + 10.0f);
-        spawnPoint.transform.position = playerSpawnPos;
-
-
-        player.transform.position = spawnPoint.transform.position;
-
         // set up world reference so Block Commands can use it
         BlockCommand.s_world = this;
 
@@ -335,13 +331,10 @@ public class WorldController : MonoBehaviour
 
     public void Regenerate(bool fromSavedMap)
     {
+        RemoveAllBlocksFromWorld();
+
         if (!fromSavedMap)
         {
-
-            RemoveAllBlocksFromWorld();
-
-
-
             _blocks = new byte[width, height, depth];
             _blockArray = new GameObject[width, height, depth];
             MakeAllAir();
@@ -359,11 +352,10 @@ public class WorldController : MonoBehaviour
                 {
                     for (int z = 0; z < depth; z++)
                     {
-                        if (y < Mathf.PerlinNoise((x + offsetX) / rand, (z + offsetY) / rand) * height)
+                        if (y < Mathf.PerlinNoise((x + offsetX) / rand, (z + offsetY) / rand) * height * 0.5)
                         {
                             _blocks[x, y, z] = (byte)Random.Range(1, 3);
                         }
-
                     }
                 }
             }
@@ -372,29 +364,35 @@ public class WorldController : MonoBehaviour
 
         // Private Methods
         _InstantiateBlocksFromVoxelData();
+        
+        Vector3 playerSpawnPos = new Vector3(width * 0.5f, height + 10.0f, depth * 0.5f);
 
-        // spawn position
+        Ball.transform.position = playerSpawnPos + new Vector3(1.0f, -1.0f, 0.0f);
+        TPBuilding.transform.position = playerSpawnPos + new Vector3(0.0f, -4.0f, 0.0f);
+
+        spawnPoint.transform.position = playerSpawnPos;
         player.transform.position = spawnPoint.transform.position;
+
+
+        // spawn temple
         IntPos playerPos = new IntPos(player.transform.position);
-
-
+        
         if (!fromSavedMap)
         {
             // create platform
             int spawnPlatformWidth = 3;
-
+        
             _GeneratePlatform(playerPos.x, playerPos.z, spawnPlatformWidth, 2, 5, BLOCK_ID.MARBLE);
             _GeneratePlatform(playerPos.x, playerPos.z, 1, 1, 1, BLOCK_ID.MARBLE);
-
+        
             _GenerateColumn(playerPos.x - spawnPlatformWidth, playerPos.z - spawnPlatformWidth);
             _GenerateColumn(playerPos.x + spawnPlatformWidth, playerPos.z + spawnPlatformWidth);
-
+        
             _GenerateColumn(playerPos.x - spawnPlatformWidth, playerPos.z + spawnPlatformWidth);
             _GenerateColumn(playerPos.x + spawnPlatformWidth, playerPos.z - spawnPlatformWidth);
-
+        
             _StackBlockOnSurface(playerPos.x, playerPos.z, (byte)BLOCK_ID.COLUMN_BASE);
         }
-
     }
 
 
@@ -457,7 +455,7 @@ public class WorldController : MonoBehaviour
         for (int y = (height - 2); y >= 0; y--)
         {
             // if a solid block is found,
-            if (blockDatabase.GetProperties((BLOCK_ID)_blocks[x, y, z]).m_isSolid)
+            if (blockDatabase.GetProperties((BLOCK_ID)_blocks[x, y, z]).m_canBePlacedUpon)
             {
                 // place a block on top of it
                 if (PlaceBlock(blockType, x, y + 1, z))
@@ -473,7 +471,7 @@ public class WorldController : MonoBehaviour
     {
         int platformAlt = _StackBlockOnSurface(xCenter, zCenter, (byte)blockType);
 
-        for (int y = platformAlt + platformHeight - 1; y > platformAlt - platformDepth; y--)
+        for (int y = platformAlt + platformHeight - 1; (y > platformAlt - platformDepth && y >= 0); y--)
         {
             for (int x = xCenter - width; x <= xCenter + width; x++)
             {

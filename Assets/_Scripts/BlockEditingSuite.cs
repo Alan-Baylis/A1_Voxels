@@ -187,6 +187,14 @@ public class BlockEditingSuite : IObservable
         {
             blockTypeSelection = BLOCK_ID.COLUMN_TOP;
         }
+        if (Input.GetKeyDown(KeyCode.Alpha7))
+        {
+            blockTypeSelection = BLOCK_ID.CLAY;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha8))
+        {
+            blockTypeSelection = BLOCK_ID.BRONZE;
+        }
 
         currentlySelectedBlockUI.text = blockDatabase.GetProperties((BLOCK_ID)blockTypeSelection).m_description;
 

@@ -66,6 +66,8 @@
     <Compile Include="Assets\_Scripts\BlockEditingSuite.cs" />
     <Compile Include="Assets\_Scripts\BlockProperties\AirBlockProperties.cs" />
     <Compile Include="Assets\_Scripts\BlockProperties\BlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\BronzeBlockProperties.cs" />
+    <Compile Include="Assets\_Scripts\BlockProperties\ClayBlockProperties.cs" />
     <Compile Include="Assets\_Scripts\BlockProperties\ColumnBaseBlockProperties.cs" />
     <Compile Include="Assets\_Scripts\BlockProperties\ColumnMidBlockProperties.cs" />
     <Compile Include="Assets\_Scripts\BlockProperties\ColumnTopBlockProperties.cs" />

@@ -12,6 +12,8 @@ public enum BLOCK_ID
     COLUMN_BASE,
     COLUMN_MID,
     COLUMN_TOP,
+    CLAY,
+    BRONZE,
     NUM_BLOCK_TYPES
 }
 
@@ -26,12 +28,12 @@ public class BlockDatabase : MonoBehaviour
     [Header("Dependencies")]
     // Declare different block Prefabs here
     // AIR doesn't get a prefab because it doesn't render
-   // public GameObject block_dirt;
-   // public GameObject block_grass;
-   // public GameObject block_marble;
-   // public GameObject block_columnBase;
-   // public GameObject block_columnMid;
-   // public GameObject block_columnTop;
+    // public GameObject block_dirt;
+    // public GameObject block_grass;
+    // public GameObject block_marble;
+    // public GameObject block_columnBase;
+    // public GameObject block_columnMid;
+    // public GameObject block_columnTop;
     //
     //public AirBlockProperties           air;
     //public DirtBlockProperties          dirt;
@@ -86,7 +88,9 @@ public class BlockDatabase : MonoBehaviour
             GetComponent<MarbleBlockProperties      >(),
             GetComponent<ColumnBaseBlockProperties  >(),
             GetComponent<ColumnMidBlockProperties   >(),
-            GetComponent<ColumnTopBlockProperties   >()
+            GetComponent<ColumnTopBlockProperties   >(),
+            GetComponent<ClayBlockProperties        >(),
+            GetComponent<BronzeBlockProperties      >(),
         };
     }
 

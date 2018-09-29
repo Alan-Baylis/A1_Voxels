@@ -133,6 +133,7 @@ public class BlockEditingSuite : IObservable
     public GhostBlockProbe ghostBlock;
 
     public Text blockDescriptionUI;
+    public Text currentlySelectedBlockUI;
 
     // Use this for initialization
     void Start()
@@ -186,7 +187,10 @@ public class BlockEditingSuite : IObservable
         {
             blockTypeSelection = BLOCK_ID.COLUMN_TOP;
         }
-        
+
+        currentlySelectedBlockUI.text = blockDatabase.GetProperties((BLOCK_ID)blockTypeSelection).m_description;
+
+
 
         // if selection within range
         if (raycastHit)

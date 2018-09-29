@@ -3,7 +3,6 @@ using UnityEngine;
 using IObserverPattern;
 using UnityEngine.UI;
 
-[System.Serializable]
 public abstract class Command
 {
     protected bool m_isCompleted = false;
@@ -12,7 +11,6 @@ public abstract class Command
     public abstract bool Undo();
 }
 
-[System.Serializable]
 public abstract class BlockCommand : Command
 {
     public static WorldController s_world;
@@ -20,7 +18,106 @@ public abstract class BlockCommand : Command
     protected IntPos m_targetOrientation;
 }
 
+public class AddBlockCommand : BlockCommand
+{
+    byte blockType;
 
+    public AddBlockCommand(byte placedBlockType, IntPos targetPosition)
+    {
+        m_targetPosition = targetPosition;
+        blockType = placedBlockType;
+        m_targetOrientation = new IntPos(0, 1, 0);
+    }
+
+    public AddBlockCommand(byte placedBlockType, IntPos targetPosition, IntPos targetOrientation)
+    {
+        m_targetPosition = targetPosition;
+        blockType = placedBlockType;
+        m_targetOrientation = targetOrientation;
+    }
+
+    public AddBlockCommand(byte placedBlockType, Vector3 targetPosition)
+    {
+        m_targetPosition = new IntPos(targetPosition);
+        blockType = placedBlockType;
+        m_targetOrientation = new IntPos(0, 1, 0);
+    }
+
+    override public bool Execute()
+    {
+        m_isCompleted = s_world.PlaceBlock(blockType, m_targetPosition);
+        return m_isCompleted;
+    }
+    public override bool Undo()
+    {
+        bool success = false;
+
+        if (m_isCompleted)
+        {
+            if (s_world.RemoveBlock(m_targetPosition))
+            {
+                m_isCompleted = false;
+                success = true;
+            }
+        }
+
+        return success;
+    }
+
+    public override bool IsCompleted()
+    {
+        return m_isCompleted;
+    }
+}
+
+public class RemoveBlockCommand : BlockCommand
+{
+    byte blockTypeToRemove;
+
+    public RemoveBlockCommand(Vector3 targetPosition)
+    {
+        m_targetPosition = new IntPos(targetPosition);
+        blockTypeToRemove = s_world.GetBlockID(m_targetPosition);
+    }
+
+    public RemoveBlockCommand(byte blockTypeAtPosition, IntPos targetPosition)
+    {
+        m_targetPosition = targetPosition;
+        blockTypeToRemove = blockTypeAtPosition;
+    }
+
+    override public bool Execute()
+    {
+        m_isCompleted = s_world.RemoveBlock(m_targetPosition);
+        Debug.Log("Remove block command executed! block type: " + (int)blockTypeToRemove + "position: " + m_targetPosition.x + "," + m_targetPosition.y + "," + m_targetPosition.z);
+        return m_isCompleted;
+    }
+
+    public override bool IsCompleted()
+    {
+        return m_isCompleted;
+    }
+
+    /// <summary>
+    /// Undo the Command if it was done already. Returns true if it was successfuly undone
+    /// </summary>
+    /// <returns></returns>
+    public override bool Undo()
+    {
+        bool success = false;
+
+        if (m_isCompleted)
+        {
+            if (s_world.PlaceBlock(blockTypeToRemove, m_targetPosition))
+            {
+                m_isCompleted = false;
+                success = true;
+            }
+        }
+
+        return success;
+    }
+}
 
 public class BlockEditingSuite : IObservable
 {
@@ -65,32 +162,31 @@ public class BlockEditingSuite : IObservable
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 10, Color.white);
         }
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1))
-            {
-                blockTypeSelection = BLOCK_ID.DIRT;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha2))
-            {
-                blockTypeSelection = BLOCK_ID.GRASS;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha3))
-            {
-                blockTypeSelection = BLOCK_ID.MARBLE;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha4))
-            {
-                blockTypeSelection = BLOCK_ID.COLUMN_BASE;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha5))
-            {
-                blockTypeSelection = BLOCK_ID.COLUMN_MID;
-            }
-            if (Input.GetKeyDown(KeyCode.Alpha6))
-            {
-                blockTypeSelection = BLOCK_ID.COLUMN_TOP;
-            }
+            blockTypeSelection = BLOCK_ID.DIRT;
         }
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            blockTypeSelection = BLOCK_ID.GRASS;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            blockTypeSelection = BLOCK_ID.MARBLE;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            blockTypeSelection = BLOCK_ID.COLUMN_BASE;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            blockTypeSelection = BLOCK_ID.COLUMN_MID;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha6))
+        {
+            blockTypeSelection = BLOCK_ID.COLUMN_TOP;
+        }
+        
 
         // if selection within range
         if (raycastHit)
@@ -98,7 +194,6 @@ public class BlockEditingSuite : IObservable
             // determine if block place position is too close to the player
             Vector3 blockPlacePosition = new IntPos((hit.point) + (hit.normal * 0.5f) + new Vector3(0.5f, 0.5f, 0.5f)).Vec3();//(new IntPos(((hit.point) + (hit.normal * 0.1f))).Vec3() + new Vector3(0.5f, 0.5f, 0.5f));
             IntPos integerPlacePosition = new IntPos(blockPlacePosition);
-            
 
             // position of the block the raycast hit
             IntPos hitBlockPosition = new IntPos((hit.point) + (hit.normal * -0.5f) + new Vector3(0.5f, 0.5f, 0.5f));

@@ -54,8 +54,8 @@ public class WorldController : MonoBehaviour
 
     public GameObject theWorld;
 
-    public GameObject TPBuilding;
-    public GameObject Ball;
+    public GameObject tpBuilding;
+    public GameObject ball;
 
     // public read-only properties
     public byte[,,] Blocks
@@ -99,6 +99,11 @@ public class WorldController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R))
         {
             Regenerate(false);
+        }
+
+        if (Input.GetKeyDown(KeyCode.M))
+        {
+            MakeAllAir();
         }
     }
 
@@ -331,10 +336,10 @@ public class WorldController : MonoBehaviour
 
     public void Regenerate(bool fromSavedMap)
     {
-        RemoveAllBlocksFromWorld();
 
         if (!fromSavedMap)
         {
+            RemoveAllBlocksFromWorld();
             _blocks = new byte[width, height, depth];
             _blockArray = new GameObject[width, height, depth];
             MakeAllAir();
@@ -364,11 +369,11 @@ public class WorldController : MonoBehaviour
 
         // Private Methods
         _InstantiateBlocksFromVoxelData();
-        
+
         Vector3 playerSpawnPos = new Vector3(width * 0.5f, height + 10.0f, depth * 0.5f);
 
-        Ball.transform.position = playerSpawnPos + new Vector3(1.0f, -1.0f, 0.0f);
-        TPBuilding.transform.position = playerSpawnPos + new Vector3(0.0f, -4.0f, 0.0f);
+        ball.transform.position = playerSpawnPos + new Vector3(1.0f, -1.0f, 0.0f);
+        tpBuilding.transform.position = playerSpawnPos + new Vector3(0.0f, -4.0f, 0.0f);
 
         spawnPoint.transform.position = playerSpawnPos;
         player.transform.position = spawnPoint.transform.position;
@@ -376,22 +381,27 @@ public class WorldController : MonoBehaviour
 
         // spawn temple
         IntPos playerPos = new IntPos(player.transform.position);
-        
+
         if (!fromSavedMap)
         {
             // create platform
             int spawnPlatformWidth = 3;
-        
+
             _GeneratePlatform(playerPos.x, playerPos.z, spawnPlatformWidth, 2, 5, BLOCK_ID.MARBLE);
             _GeneratePlatform(playerPos.x, playerPos.z, 1, 1, 1, BLOCK_ID.MARBLE);
-        
+
             _GenerateColumn(playerPos.x - spawnPlatformWidth, playerPos.z - spawnPlatformWidth);
             _GenerateColumn(playerPos.x + spawnPlatformWidth, playerPos.z + spawnPlatformWidth);
-        
+
             _GenerateColumn(playerPos.x - spawnPlatformWidth, playerPos.z + spawnPlatformWidth);
             _GenerateColumn(playerPos.x + spawnPlatformWidth, playerPos.z - spawnPlatformWidth);
-        
+
             _StackBlockOnSurface(playerPos.x, playerPos.z, (byte)BLOCK_ID.COLUMN_BASE);
+
+
+            // create walls around world
+
+            _GenerateWalls((byte)BLOCK_ID.MARBLE, (uint)height/2);
         }
     }
 
@@ -471,7 +481,7 @@ public class WorldController : MonoBehaviour
     {
         int platformAlt = _StackBlockOnSurface(xCenter, zCenter, (byte)blockType);
 
-        for (int y = platformAlt + platformHeight - 1; (y > platformAlt - platformDepth && y >= 0); y--)
+        for (int y = platformAlt + platformHeight - 1; (y > platformAlt - platformDepth) && y >= 0; y--)
         {
             for (int x = xCenter - width; x <= xCenter + width; x++)
             {
@@ -494,6 +504,87 @@ public class WorldController : MonoBehaviour
         _StackBlockOnSurface(x, z, (byte)BLOCK_ID.COLUMN_MID);
         _StackBlockOnSurface(x, z, (byte)BLOCK_ID.COLUMN_TOP);
         _StackBlockOnSurface(x, z, (byte)BLOCK_ID.MARBLE);
+    }
+
+    // Sets block even if it is already occupied
+    private void _SetBlock(byte blockTypeID, int x, int y, int z)
+    {
+        try
+        {
+            // if the block was occupied by something destroy it
+            if (_blockArray[x, y, z] != null)
+            {
+                Destroy(_blockArray[x, y, z]);
+                _blockArray[x, y, z] = null;
+            }
+
+            // set block data
+            _blocks[x, y, z] = blockTypeID;
+
+            // place gameobject associated with the block
+            GameObject blockPrefab = blockDatabase.GetBlockPrefab(blockTypeID);
+            if (blockPrefab != null)
+            {
+                // create gameobject
+                _blockArray[x, y, z] = (Instantiate(blockPrefab, new Vector3(x, y, z), Quaternion.identity));
+                _blockArray[x, y, z].transform.SetParent(theWorld.transform);
+            } 
+        }
+        catch (System.Exception ex)
+        {
+            Debug.Log("Error: _SetBlock: " + ex.Message);
+        }
+    }
+
+    /// <summary>
+    /// Creates walls around the level
+    /// </summary>
+    private void _GenerateWalls(byte blockType, uint wallheight)
+    {
+
+
+
+      for(int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < wallheight; y++)
+            {
+                _SetBlock(blockType, x, y, 0);
+            }
+        }
+
+        // 
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < wallheight; y++)
+            {
+                _SetBlock(blockType, x, y, depth - 1);
+            }
+        }
+
+
+
+
+
+        //
+
+        for (int z = 0; z < depth; z++)
+        {
+            for (int y = 0; y < wallheight; y++)
+            {
+                _SetBlock(blockType, 0, y, z);
+            }
+        }
+
+        //
+
+        for (int z = 0; z < depth; z++)
+        {
+            for (int y = 0; y < wallheight; y++)
+            {
+                _SetBlock(blockType, width - 1, y, z);
+            }
+        }
     }
 }
 

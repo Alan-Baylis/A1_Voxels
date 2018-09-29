@@ -418,12 +418,12 @@ public class WorldController : MonoBehaviour
                     byte blockTypeToGenerate = _blocks[x, y, z];
 
                     if (blockTypeToGenerate != 0 && (
-                        (x == 0 || _blocks[x - 1, y, z] == 0) ||
-                        (y == 0 || _blocks[x, y - 1, z] == 0) ||
-                        (z == 0 || _blocks[x, y, z - 1] == 0) ||
-                        (x == width - 1 || _blocks[x + 1, y, z] == 0) ||
-                        (y == height - 1 || _blocks[x, y + 1, z] == 0) ||
-                        (z == depth - 1 || _blocks[x, y, z + 1] == 0)))
+                        (x == 0 ||              blockDatabase.GetProperties((BLOCK_ID)_blocks[x - 1, y, z]).m_isTransparent) ||
+                        (y == 0 ||              blockDatabase.GetProperties((BLOCK_ID)_blocks[x, y - 1, z]).m_isTransparent) ||
+                        (z == 0 ||              blockDatabase.GetProperties((BLOCK_ID)_blocks[x, y, z - 1]).m_isTransparent) ||
+                        (x == width - 1 ||      blockDatabase.GetProperties((BLOCK_ID)_blocks[x + 1, y, z]).m_isTransparent) ||
+                        (y == height - 1 ||     blockDatabase.GetProperties((BLOCK_ID)_blocks[x, y + 1, z]).m_isTransparent) ||
+                        (z == depth - 1 ||      blockDatabase.GetProperties((BLOCK_ID)_blocks[x, y, z + 1]).m_isTransparent)))
                     {
                         _blockArray[x, y, z] = (Instantiate(blockDatabase.GetBlockPrefab(blockTypeToGenerate), new Vector3(x, y, z), Quaternion.identity));
                         _blockArray[x, y, z].transform.SetParent(theWorld.transform);

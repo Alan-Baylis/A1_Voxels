@@ -58,6 +58,8 @@
      <Compile Include="Assets\_Scripts\BlockEditingSuite.cs" />
      <Compile Include="Assets\_Scripts\BlockProperties\AirBlockProperties.cs" />
      <Compile Include="Assets\_Scripts\BlockProperties\BlockProperties.cs" />
+     <Compile Include="Assets\_Scripts\BlockProperties\BronzeBlockProperties.cs" />
+     <Compile Include="Assets\_Scripts\BlockProperties\ClayBlockProperties.cs" />
      <Compile Include="Assets\_Scripts\BlockProperties\ColumnBaseBlockProperties.cs" />
      <Compile Include="Assets\_Scripts\BlockProperties\ColumnMidBlockProperties.cs" />
      <Compile Include="Assets\_Scripts\BlockProperties\ColumnTopBlockProperties.cs" />
@@ -69,6 +71,7 @@
      <Compile Include="Assets\_Scripts\GhostBlockProbe.cs" />
      <Compile Include="Assets\_Scripts\IObservable.cs" />
      <Compile Include="Assets\_Scripts\IObserver.cs" />
+     <Compile Include="Assets\_Scripts\killbox.cs" />
      <Compile Include="Assets\_Scripts\PlayerAchievementChecker.cs" />
      <Compile Include="Assets\_Scripts\PlayerController.cs" />
      <Compile Include="Assets\_Scripts\WorldController.cs" />

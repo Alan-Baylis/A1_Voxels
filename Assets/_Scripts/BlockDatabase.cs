@@ -12,6 +12,8 @@ public enum BLOCK_ID
     COLUMN_BASE,
     COLUMN_MID,
     COLUMN_TOP,
+    CLAY,
+    BRONZE,
     NUM_BLOCK_TYPES
 }
 
@@ -86,7 +88,9 @@ public class BlockDatabase : MonoBehaviour
             GetComponent<MarbleBlockProperties      >(),
             GetComponent<ColumnBaseBlockProperties  >(),
             GetComponent<ColumnMidBlockProperties   >(),
-            GetComponent<ColumnTopBlockProperties   >()
+            GetComponent<ColumnTopBlockProperties   >(),
+            GetComponent<ClayBlockProperties        >(),
+            GetComponent<BronzeBlockProperties      >()
         };
     }
 

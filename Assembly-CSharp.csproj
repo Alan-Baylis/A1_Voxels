@@ -9,7 +9,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{1B65E80C-B312-CD60-A810-87CCD12606EC}</ProjectGuid>
+    <ProjectGuid>{D175CCDB-9F01-D142-915C-3B56E2B9199D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -94,16 +94,16 @@
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_Sprite.shader" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface.shader" />
  <Reference Include="UnityEditor.StandardEvents">
- <HintPath>C:/Users/tsili/Desktop/A1_Voxels/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+ <HintPath>C:/Users/tsili/Desktop/A1_Voxels_Master/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro.Editor">
- <HintPath>C:/Users/tsili/Desktop/A1_Voxels/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
+ <HintPath>C:/Users/tsili/Desktop/A1_Voxels_Master/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.PackageManagerUI.Editor">
- <HintPath>C:/Users/tsili/Desktop/A1_Voxels/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+ <HintPath>C:/Users/tsili/Desktop/A1_Voxels_Master/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
  </Reference>
  <Reference Include="Unity.TextMeshPro">
- <HintPath>C:/Users/tsili/Desktop/A1_Voxels/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
+ <HintPath>C:/Users/tsili/Desktop/A1_Voxels_Master/Library/ScriptAssemblies/Unity.TextMeshPro.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.AIModule">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.1.9f2/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
@@ -286,7 +286,7 @@
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.1.9f2/Editor/Data/Managed/Unity.Locator.dll</HintPath>
  </Reference>
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>C:/Users/tsili/Desktop/A1_Voxels/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>C:/Users/tsili/Desktop/A1_Voxels_Master/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2018.1.9f2/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
@@ -345,7 +345,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
-      <Project>{566994DB-BDAF-FDEB-4C99-74A1C7F59045}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
+      <Project>{2BABF545-162C-A924-CC1B-6F51F9FCAFCF}</Project>      <Name>Assembly-CSharp-firstpass</Name>    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

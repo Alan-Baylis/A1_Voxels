@@ -141,6 +141,7 @@ public class BlockEditingSuite : IObservable
     public List<GameObject> activeItems;
     public List<GameObject> equippedItems;
 
+    [HideInInspector]
     public static bool itemsHaveChanged;
 
     private int _numberOfActiveItems;
@@ -151,6 +152,9 @@ public class BlockEditingSuite : IObservable
         commandList = new LinkedList<Command>();
         itemsHaveChanged = false;
         _loadItemsFromEquippedList();
+
+        blockTypeSelection = BLOCK_ID.DIRT;
+        selectors[0].SetActive(true);
     }
 
     // Update is called once per frame
@@ -239,7 +243,7 @@ public class BlockEditingSuite : IObservable
             }
 
             // Place Block
-            if ((Input.GetButtonDown("PlaceBlock") && (_numberOfActiveItems > 0)))  
+            if ((Input.GetButtonDown("PlaceBlock") && (_numberOfActiveItems > 0)))
             {
                 // determine if block place position is too close to the player
                 if (!ghostBlock.IsColliding() && hitBlockProperties.m_canBePlacedUpon)
@@ -334,6 +338,8 @@ public class BlockEditingSuite : IObservable
     private void _loadItemsFromEquippedList()
     {
         _numberOfActiveItems = 0;
+        int currentSelection = (int)blockTypeSelection;
+        Debug.Log("Current Selection: " + currentSelection);
 
         foreach (GameObject item in activeItems)
         {
@@ -356,8 +362,25 @@ public class BlockEditingSuite : IObservable
             }
         }
 
-        if(_numberOfActiveItems == 0) {
+        // if no blocks are loaded 
+        if (_numberOfActiveItems == 0)
+        {
             _hideSelectors();
+            blockTypeSelection = BLOCK_ID.AIR;
+        }
+
+        // if the current item has no block loaded
+        if(activeItems[currentSelection - 1].transform.childCount == 0) {
+            Debug.Log("selection " + (currentSelection - 1) + " has no children");
+            _hideSelectors();
+            for (int count = 0; count < activeItems.Count; count++)    
+            {
+                // find the first item that has a block loaded
+                if(activeItems[count].transform.childCount > 0) {
+                    selectors[count].SetActive(true);
+                    break;
+                }
+            }
         }
     }
 }

@@ -67,13 +67,14 @@
      <Compile Include="Assets\_Scripts\BlockProperties\GrassBlockProperties.cs" />
      <Compile Include="Assets\_Scripts\BlockProperties\MarbleBlockProperties.cs" />
      <Compile Include="Assets\_Scripts\FileManager.cs" />
-     <Compile Include="Assets\_Scripts\FirstPersonController.cs" />
      <Compile Include="Assets\_Scripts\GhostBlockProbe.cs" />
      <Compile Include="Assets\_Scripts\IObservable.cs" />
      <Compile Include="Assets\_Scripts\IObserver.cs" />
      <Compile Include="Assets\_Scripts\killbox.cs" />
      <Compile Include="Assets\_Scripts\PlayerAchievementChecker.cs" />
-     <Compile Include="Assets\_Scripts\PlayerController.cs" />
+     <Compile Include="Assets\_Scripts\UI\Draggable.cs" />
+     <Compile Include="Assets\_Scripts\UI\Slot.cs" />
+     <Compile Include="Assets\_Scripts\UI\UIManager.cs" />
      <Compile Include="Assets\_Scripts\WorldController.cs" />
      <None Include="Assets\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />
      <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />

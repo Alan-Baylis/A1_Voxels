@@ -125,8 +125,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0.8, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4839161684932350}
   - {fileID: 4917473631771862}
+  - {fileID: 4839161684932350}
   - {fileID: 4785973034423832}
   m_Father: {fileID: 4676066533117824}
   m_RootOrder: 0
@@ -150,13 +150,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1510565277597640}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.509, y: -0.32, z: 0.267}
-  m_LocalScale: {x: 0.17498678, y: 0.17498678, z: 0.84984076}
+  m_LocalRotation: {x: -0.044770826, y: -0.21476087, z: -0.19910944, w: 0.9551067}
+  m_LocalPosition: {x: 0.484175, y: -0.34839922, z: 0.30321354}
+  m_LocalScale: {x: 0.17498678, y: 0.17498678, z: 0.64936334}
   m_Children: []
   m_Father: {fileID: 4711612356134162}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -9.849001, y: -23.471, z: -21.501001}
 --- !u!4 &4917473631771862
 Transform:
   m_ObjectHideFlags: 1
@@ -168,7 +168,7 @@ Transform:
   m_LocalScale: {x: 0.32605863, y: 0.21387814, z: 0.32605863}
   m_Children: []
   m_Father: {fileID: 4711612356134162}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!20 &20226005549086674
 Camera:
@@ -191,7 +191,7 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.1
-  far clip plane: 64
+  far clip plane: 100
   field of view: 75
   orthographic: 0
   orthographic size: 5
@@ -582,9 +582,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67db34676a2096440bc6776520782660, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  world: {fileID: 0}
+  blockDatabase: {fileID: 0}
   m_maxBlockPlacingRange: 6
   blockTypeSelection: 1
   ghostBlock: {fileID: 0}
+  blockDescriptionUI: {fileID: 0}
+  currentlySelectedBlockUI: {fileID: 0}
 --- !u!114 &114572903132626002
 MonoBehaviour:
   m_ObjectHideFlags: 1

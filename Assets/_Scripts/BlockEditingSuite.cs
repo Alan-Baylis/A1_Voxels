@@ -143,6 +143,8 @@ public class BlockEditingSuite : IObservable
 
     public static bool itemsHaveChanged;
 
+    private int _numberOfActiveItems;
+
     // Use this for initialization
     void Start()
     {
@@ -154,7 +156,8 @@ public class BlockEditingSuite : IObservable
     // Update is called once per frame
     void Update()
     {
-        if(itemsHaveChanged) {
+        if (itemsHaveChanged)
+        {
             _loadItemsFromEquippedList();
             itemsHaveChanged = false;
         }
@@ -178,60 +181,28 @@ public class BlockEditingSuite : IObservable
             Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 10, Color.white);
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            blockTypeSelection = BLOCK_ID.DIRT;
-            _hideSelectors();
-            selectors[0].SetActive(true);
-        }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2))
+        // Input Function
+        if (Input.anyKeyDown)
         {
-            blockTypeSelection = BLOCK_ID.GRASS;
-            _hideSelectors();
-            selectors[1].SetActive(true);
-        }
+            int numberKey = 0;
+            if (int.TryParse(Input.inputString, out numberKey))
+            {
+                if ((numberKey > 0) && (numberKey < 8))
+                {
+                    if (activeItems[numberKey - 1].transform.childCount > 0)
+                    {
+                        string itemName = activeItems[numberKey - 1].transform.GetChild(0).gameObject.name;
+                        int bracketIndex = itemName.IndexOf("(");
+                        itemName = itemName.Substring(0, bracketIndex);
+                        blockTypeSelection = (BLOCK_ID)System.Enum.Parse(typeof(BLOCK_ID), itemName.ToUpper());
+                        _hideSelectors();
+                        selectors[numberKey - 1].SetActive(true);
+                    }
+                }
 
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            blockTypeSelection = BLOCK_ID.MARBLE;
-            _hideSelectors();
-            selectors[2].SetActive(true);
+            }
         }
-
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            blockTypeSelection = BLOCK_ID.COLUMN_BASE;
-            _hideSelectors();
-            selectors[3].SetActive(true);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            blockTypeSelection = BLOCK_ID.COLUMN_MID;
-            _hideSelectors();
-            selectors[4].SetActive(true);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha6))
-        {
-            blockTypeSelection = BLOCK_ID.COLUMN_TOP;
-            _hideSelectors();
-            selectors[5].SetActive(true);
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha7))
-        {
-            blockTypeSelection = BLOCK_ID.CLAY;
-            _hideSelectors();
-            selectors[6].SetActive(true);
-        }
-
-        /* 
-        if (Input.GetKeyDown(KeyCode.Alpha8))
-        {
-            blockTypeSelection = BLOCK_ID.BRONZE;
-        }
-        */
 
         currentlySelectedBlockUI.text = blockDatabase.GetProperties((BLOCK_ID)blockTypeSelection).m_description;
 
@@ -268,7 +239,7 @@ public class BlockEditingSuite : IObservable
             }
 
             // Place Block
-            if (Input.GetButtonDown("PlaceBlock"))
+            if ((Input.GetButtonDown("PlaceBlock") && (_numberOfActiveItems > 0)))  
             {
                 // determine if block place position is too close to the player
                 if (!ghostBlock.IsColliding() && hitBlockProperties.m_canBePlacedUpon)
@@ -292,7 +263,7 @@ public class BlockEditingSuite : IObservable
             // Remove Block
             if (Input.GetButtonDown("RemoveBlock"))
             {
-                
+
 
                 Debug.Log("Removing block!");
                 Command cmd = new RemoveBlockCommand(hitBlockType, hitBlockPosition);
@@ -352,17 +323,22 @@ public class BlockEditingSuite : IObservable
 
     // private methods
 
-    private void _hideSelectors() {
+    private void _hideSelectors()
+    {
         foreach (var selector in selectors)
         {
             selector.SetActive(false);
         }
     }
 
-    private void _loadItemsFromEquippedList() {
+    private void _loadItemsFromEquippedList()
+    {
+        _numberOfActiveItems = 0;
+
         foreach (GameObject item in activeItems)
         {
-            if(item.transform.childCount>0) {
+            if (item.transform.childCount > 0)
+            {
                 Destroy(item.transform.GetChild(0).gameObject);
             }
         }
@@ -370,12 +346,18 @@ public class BlockEditingSuite : IObservable
 
         for (int count = 0; count < equippedItems.Count; count++)
         {
-            if(equippedItems[count].transform.childCount > 0) {
+            if (equippedItems[count].transform.childCount > 0)
+            {
                 Transform itemToClone = equippedItems[count].transform.GetChild(0);
                 Transform clonedItem = Instantiate(itemToClone);
                 clonedItem.localScale = new Vector3(0.5f, 0.5f, 1.0f);
                 clonedItem.SetParent(activeItems[count].transform);
+                _numberOfActiveItems++;
             }
+        }
+
+        if(_numberOfActiveItems == 0) {
+            _hideSelectors();
         }
     }
 }

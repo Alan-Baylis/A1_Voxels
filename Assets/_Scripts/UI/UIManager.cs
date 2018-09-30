@@ -20,11 +20,6 @@ public class UIManager : MonoBehaviour
     public float panelSpeed;
     public Animator animator;
 
-    [Header("Panel Groups")]
-    public List<Transform> inventoryList;
-    public List<Transform> equippedList;
-
-
     // Use this for initialization
     void Start()
     {

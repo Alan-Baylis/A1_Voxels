@@ -67,6 +67,7 @@ public class UIManager : MonoBehaviour
         playerController.GetComponent<FirstPersonController>().enabled = true;
         reticle.SetActive(true);
         panel.SetActive(false);
+        BlockEditingSuite.itemsHaveChanged = true;
     }
 
 }

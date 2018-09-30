@@ -119,6 +119,7 @@ public class RemoveBlockCommand : BlockCommand
     }
 }
 
+[System.Serializable]
 public class BlockEditingSuite : IObservable
 {
     public WorldController world;
@@ -135,15 +136,29 @@ public class BlockEditingSuite : IObservable
     public Text blockDescriptionUI;
     public Text currentlySelectedBlockUI;
 
+    [Header("UI Items")]
+    public List<GameObject> selectors;
+    public List<GameObject> activeItems;
+    public List<GameObject> equippedItems;
+
+    public static bool itemsHaveChanged;
+
     // Use this for initialization
     void Start()
     {
         commandList = new LinkedList<Command>();
+        itemsHaveChanged = false;
+        _loadItemsFromEquippedList();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(itemsHaveChanged) {
+            _loadItemsFromEquippedList();
+            itemsHaveChanged = false;
+        }
+
 
         bool raycastHit = false;
 
@@ -166,35 +181,57 @@ public class BlockEditingSuite : IObservable
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
             blockTypeSelection = BLOCK_ID.DIRT;
+            _hideSelectors();
+            selectors[0].SetActive(true);
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
             blockTypeSelection = BLOCK_ID.GRASS;
+            _hideSelectors();
+            selectors[1].SetActive(true);
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
             blockTypeSelection = BLOCK_ID.MARBLE;
+            _hideSelectors();
+            selectors[2].SetActive(true);
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha4))
         {
             blockTypeSelection = BLOCK_ID.COLUMN_BASE;
+            _hideSelectors();
+            selectors[3].SetActive(true);
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha5))
         {
             blockTypeSelection = BLOCK_ID.COLUMN_MID;
+            _hideSelectors();
+            selectors[4].SetActive(true);
         }
+
         if (Input.GetKeyDown(KeyCode.Alpha6))
         {
             blockTypeSelection = BLOCK_ID.COLUMN_TOP;
+            _hideSelectors();
+            selectors[5].SetActive(true);
         }
         if (Input.GetKeyDown(KeyCode.Alpha7))
         {
             blockTypeSelection = BLOCK_ID.CLAY;
+            _hideSelectors();
+            selectors[6].SetActive(true);
         }
+
+        /* 
         if (Input.GetKeyDown(KeyCode.Alpha8))
         {
             blockTypeSelection = BLOCK_ID.BRONZE;
         }
+        */
 
         currentlySelectedBlockUI.text = blockDatabase.GetProperties((BLOCK_ID)blockTypeSelection).m_description;
 
@@ -311,5 +348,34 @@ public class BlockEditingSuite : IObservable
     public void Add(Command command)
     {
         commandList.AddLast(command);
+    }
+
+    // private methods
+
+    private void _hideSelectors() {
+        foreach (var selector in selectors)
+        {
+            selector.SetActive(false);
+        }
+    }
+
+    private void _loadItemsFromEquippedList() {
+        foreach (GameObject item in activeItems)
+        {
+            if(item.transform.childCount>0) {
+                Destroy(item.transform.GetChild(0).gameObject);
+            }
+        }
+
+
+        for (int count = 0; count < equippedItems.Count; count++)
+        {
+            if(equippedItems[count].transform.childCount > 0) {
+                Transform itemToClone = equippedItems[count].transform.GetChild(0);
+                Transform clonedItem = Instantiate(itemToClone);
+                clonedItem.localScale = new Vector3(0.5f, 0.5f, 1.0f);
+                clonedItem.SetParent(activeItems[count].transform);
+            }
+        }
     }
 }

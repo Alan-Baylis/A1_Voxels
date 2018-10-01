@@ -144,7 +144,7 @@ public class BlockEditingSuite : IObservable
     [HideInInspector]
     public static bool itemsHaveChanged;
 
-    private int _numberOfActiveItems;
+    private int toolbarSlotSelection = 0;
 
     // Use this for initialization
     void Start()
@@ -192,24 +192,28 @@ public class BlockEditingSuite : IObservable
             int numberKey = 0;
             if (int.TryParse(Input.inputString, out numberKey))
             {
+
                 if ((numberKey > 0) && (numberKey < 8))
                 {
-                    if (activeItems[numberKey - 1].transform.childCount > 0)
+                    // remap from 1234567890 to 0123456789 (because of keyboard layout)
+                    toolbarSlotSelection = (numberKey + 9) % 10;
+
+                    if (activeItems[toolbarSlotSelection].transform.childCount > 0)
                     {
-                        string itemName = activeItems[numberKey - 1].transform.GetChild(0).gameObject.name;
+                        string itemName = activeItems[toolbarSlotSelection].transform.GetChild(0).gameObject.name;
                         int bracketIndex = itemName.IndexOf("(");
                         itemName = itemName.Substring(0, bracketIndex);
                         blockTypeSelection = (BLOCK_ID)System.Enum.Parse(typeof(BLOCK_ID), itemName.ToUpper());
                         _hideSelectors();
-                        selectors[numberKey - 1].SetActive(true);
+                        selectors[toolbarSlotSelection].SetActive(true);
                     }
                 }
 
             }
         }
 
-        currentlySelectedBlockUI.text = blockDatabase.GetProperties((BLOCK_ID)blockTypeSelection).m_description;
 
+        currentlySelectedBlockUI.text = blockDatabase.GetProperties((BLOCK_ID)blockTypeSelection).m_description;
 
 
         // if selection within range
@@ -243,7 +247,7 @@ public class BlockEditingSuite : IObservable
             }
 
             // Place Block
-            if ((Input.GetButtonDown("PlaceBlock") && (_numberOfActiveItems > 0)))
+            if ((Input.GetButtonDown("PlaceBlock")))
             {
                 // determine if block place position is too close to the player
                 if (!ghostBlock.IsColliding() && hitBlockProperties.m_canBePlacedUpon)
@@ -337,9 +341,6 @@ public class BlockEditingSuite : IObservable
 
     private void _loadItemsFromEquippedList()
     {
-        _numberOfActiveItems = 0;
-        int currentSelection = (int)blockTypeSelection;
-        Debug.Log("Current Selection: " + currentSelection);
 
         foreach (GameObject item in activeItems)
         {
@@ -358,29 +359,44 @@ public class BlockEditingSuite : IObservable
                 Transform clonedItem = Instantiate(itemToClone);
                 clonedItem.localScale = new Vector3(0.5f, 0.5f, 1.0f);
                 clonedItem.SetParent(activeItems[count].transform);
-                _numberOfActiveItems++;
             }
         }
 
-        // if no blocks are loaded 
-        if (_numberOfActiveItems == 0)
+        // if there is something in the selected slot
+        if (toolbarSlotSelection != -1 && equippedItems[toolbarSlotSelection].transform.childCount > 0)
         {
-            _hideSelectors();
-            blockTypeSelection = BLOCK_ID.AIR;
-        }
 
-        // if the current item has no block loaded
-        if(activeItems[currentSelection - 1].transform.childCount == 0) {
-            Debug.Log("selection " + (currentSelection - 1) + " has no children");
-            _hideSelectors();
-            for (int count = 0; count < activeItems.Count; count++)    
+        }
+        else
+        {
+            toolbarSlotSelection = -1;
+
+            for (int count = 0; count < equippedItems.Count; count++)
             {
                 // find the first item that has a block loaded
-                if(activeItems[count].transform.childCount > 0) {
-                    selectors[count].SetActive(true);
-                    break;
+
+                if (equippedItems[count].transform.childCount > 0)
+                {
+                    toolbarSlotSelection = count;
                 }
             }
+        }
+
+
+        // show selector UI for current selected slot
+        _hideSelectors();
+
+        if (toolbarSlotSelection != -1)
+        {
+            // select the block type in that slot
+            string itemName = equippedItems[toolbarSlotSelection].transform.GetChild(0).gameObject.name;
+            blockTypeSelection = (BLOCK_ID)System.Enum.Parse(typeof(BLOCK_ID), itemName.ToUpper());
+
+            selectors[toolbarSlotSelection].SetActive(true);
+
+        } else
+        {
+            blockTypeSelection = BLOCK_ID.AIR;
         }
     }
 }
